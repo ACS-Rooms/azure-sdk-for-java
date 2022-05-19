@@ -43,8 +43,13 @@
 //             "COMMUNICATION_LIVETEST_STATIC_CONNECTION_STRING",
 //             "endpoint=https://REDACTED.communication.azure.com/;accesskey=P2tP5RwZVFcJa3sfJvHEmGaKbemSAw2e");
 
+<<<<<<< HEAD
 //     protected static final OffsetDateTime VALID_FROM = OffsetDateTime.of(2022, 5, 1, 5, 30, 20, 10, ZoneOffset.UTC);
 //     protected static final OffsetDateTime VALID_UNTIL = VALID_FROM.plusDays(30);
+=======
+    protected static final OffsetDateTime VALID_FROM = OffsetDateTime.now(ZoneOffset.UTC);
+    protected static final OffsetDateTime VALID_UNTIL = VALID_FROM.plusDays(30);
+>>>>>>> c4452e97fdd (Updating JAVA SDK with Open Rooms changes.)
 
 //     protected List<RoomParticipant> participants1;
 //     protected List<RoomParticipant> participants2;
