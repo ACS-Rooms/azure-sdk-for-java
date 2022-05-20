@@ -7,7 +7,7 @@ package com.azure.communication.rooms.implementation.models;
 import com.azure.core.annotation.Fluent;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
 
 /** Request payload for updating a room. */
 @Fluent
@@ -30,7 +30,7 @@ public final class UpdateRoomRequest {
      * (Optional) Collection of identities invited to the room.
      */
     @JsonProperty(value = "participants")
-    private Map<String, RoomParticipantInternal> participants;
+    private List<Participant> participants;
 
     /**
      * Get the validFrom property: (Optional) The timestamp from when the room is open for joining. The timestamp is in
@@ -81,7 +81,7 @@ public final class UpdateRoomRequest {
      *
      * @return the participants value.
      */
-    public Map<String, RoomParticipantInternal> getParticipants() {
+    public List<Participant> getParticipants() {
         return this.participants;
     }
 
@@ -91,7 +91,7 @@ public final class UpdateRoomRequest {
      * @param participants the participants value to set.
      * @return the UpdateRoomRequest object itself.
      */
-    public UpdateRoomRequest setParticipants(Map<String, RoomParticipantInternal> participants) {
+    public UpdateRoomRequest setParticipants(List<Participant> participants) {
         this.participants = participants;
         return this;
     }

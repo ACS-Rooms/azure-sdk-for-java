@@ -7,7 +7,7 @@ package com.azure.communication.rooms.implementation.models;
 import com.azure.core.annotation.Fluent;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
 
 /** The create room request body. */
 @Fluent
@@ -30,7 +30,7 @@ public final class CreateRoomRequest {
      * (Optional) Collection of identities invited to the room.
      */
     @JsonProperty(value = "participants")
-    private Map<String, RoomParticipantInternal> participants;
+    private List<Participant> participants;
 
     /**
      * Get the validFrom property: The timestamp from when the room is open for joining. The timestamp is in RFC3339
@@ -81,7 +81,7 @@ public final class CreateRoomRequest {
      *
      * @return the participants value.
      */
-    public Map<String, RoomParticipantInternal> getParticipants() {
+    public List<Participant> getParticipants() {
         return this.participants;
     }
 
@@ -91,7 +91,7 @@ public final class CreateRoomRequest {
      * @param participants the participants value to set.
      * @return the CreateRoomRequest object itself.
      */
-    public CreateRoomRequest setParticipants(Map<String, RoomParticipantInternal> participants) {
+    public CreateRoomRequest setParticipants(List<Participant> participants) {
         this.participants = participants;
         return this;
     }

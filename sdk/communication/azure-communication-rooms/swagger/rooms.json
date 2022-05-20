@@ -179,7 +179,7 @@
         "summary": "Update a room with given changes.",
         "operationId": "Rooms_UpdateRoom",
         "consumes": [
-          "application/merge-patch+json"
+          "application/json"
         ],
         "produces": [
           "text/plain",
@@ -228,6 +228,13 @@
           },
           "403": {
             "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "412": {
+            "description": "Precondition Failed",
             "schema": {
               "$ref": "#/definitions/CommunicationErrorResponse"
             },
@@ -307,9 +314,319 @@
           }
         }
       }
+    },
+    "/rooms/{roomId}/participants/:add": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Adds participants to a room. If participants already exist, no change occurs.",
+        "operationId": "Room_AddParticipants",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "roomId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "in": "body",
+            "name": "addParticipantsRequest",
+            "schema": {
+              "$ref": "#/definitions/AddParticipantsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The participants were successfully added.",
+            "schema": {
+              "$ref": "#/definitions/RoomModel"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "500": {
+            "description": "InternalServerError",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          }
+        },
+        "x-ms-examples": {
+          "Add participants": {
+            "$ref": "./examples/Participants_AddParticipants.json"
+          }
+        }
+      }
+    },
+    "/rooms/{roomId}/participants/:update": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Update participants in a room.",
+        "operationId": "Room_UpdateParticipants",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "roomId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "in": "body",
+            "name": "updateParticipantsRequest",
+            "schema": {
+              "$ref": "#/definitions/UpdateParticipantsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The participants were successfully updated. The action returns an updated `Room`.",
+            "schema": {
+              "$ref": "#/definitions/RoomModel"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "500": {
+            "description": "InternalServerError",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          }
+        },
+        "x-ms-examples": {
+          "Update participants": {
+            "$ref": "./examples/Participants_UpdateParticipants.json"
+          }
+        }
+      }
+    },
+    "/rooms/{roomId}/participants/:remove": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Remove participants from a room.",
+        "operationId": "Room_RemoveParticipants",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "roomId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "in": "body",
+            "name": "removeParticipantsRequest",
+            "schema": {
+              "$ref": "#/definitions/RemoveParticipantsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The participants were successfully deleted. The action returns an updated `Room`.",
+            "schema": {
+              "$ref": "#/definitions/RoomModel"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "500": {
+            "description": "InternalServerError",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          }
+        },
+        "x-ms-examples": {
+          "Remove participants": {
+            "$ref": "./examples/Participants_RemoveParticipants.json"
+          }
+        }
+      }
+    },
+    "/rooms/{roomId}/participants": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get participants in a room.",
+        "operationId": "Room_GetParticipants",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "roomId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request successful. The action returns the room Participants.",
+            "schema": {
+              "$ref": "#/definitions/RoomModel"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "403": {
+            "description": "Forbidden",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          },
+          "500": {
+            "description": "InternalServerError",
+            "schema": {
+              "$ref": "#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          }
+        },
+        "x-ms-examples": {
+          "Get participants": {
+            "$ref": "./examples/Participants_GetParticipants.json"
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "AddParticipantsRequest": {
+      "description": "Participants to be added to the room.",
+      "required": [
+        "participants"
+      ],
+      "type": "object",
+      "properties": {
+        "participants": {
+          "description": "Participants to add to a room.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
+        }
+      }
+    },
     "CommunicationError": {
       "description": "The Communication Services error.",
       "required": [
@@ -354,6 +671,32 @@
         }
       }
     },
+    "CommunicationIdentifierModel": {
+      "description": "Identifies a participant in Azure Communication services. A participant is, for example, a phone number or an Azure communication user. This model must be interpreted as a union: Apart from rawId, at most one further property may be set.",
+      "type": "object",
+      "properties": {
+        "rawId": {
+          "description": "Raw Id of the identifier. Optional in requests, required in responses.",
+          "type": "string"
+        },
+        "communicationUser": {
+          "$ref": "#/definitions/CommunicationUserIdentifierModel"
+        }
+      }
+    },
+    "CommunicationUserIdentifierModel": {
+      "description": "A user that got created with an Azure Communication Services resource.",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The Id of the communication user.",
+          "type": "string"
+        }
+      }
+    },
     "CreateRoomRequest": {
       "description": "The create room request body.",
       "type": "object",
@@ -372,20 +715,64 @@
         },
         "participants": {
           "description": "(Optional) Collection of identities invited to the room.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/RoomParticipantInternal"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
           }
         }
       }
     },
-    "RoomParticipantInternal": {
+    "Participant": {
       "description": "A participant of the room.",
+      "required": [
+        "communicationIdentifier"
+      ],
       "type": "object",
       "properties": {
+        "communicationIdentifier": {
+          "$ref": "#/definitions/CommunicationIdentifierModel"
+        },
         "role": {
           "description": "Role Name.",
           "type": "string"
+        }
+      }
+    },
+    "ProblemDetails": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "instance": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": { }
+    },
+    "RemoveParticipantsRequest": {
+      "description": "Participants to be removed from the room.",
+      "required": [
+        "participants"
+      ],
+      "type": "object",
+      "properties": {
+        "participants": {
+          "description": "Participants to be removed from a room.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
         }
       }
     },
@@ -418,9 +805,9 @@
         },
         "participants": {
           "description": "Collection of identities invited to the room.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/RoomParticipantInternal"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
           }
         }
       }
@@ -443,9 +830,25 @@
         },
         "participants": {
           "description": "(Optional) Collection of identities invited to the room.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/RoomParticipantInternal"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
+        }
+      }
+    },
+    "UpdateParticipantsRequest": {
+      "description": "Participants to be updated in a room.",
+      "required": [
+        "participants"
+      ],
+      "type": "object",
+      "properties": {
+        "participants": {
+          "description": "Participants to update in a room.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
           }
         }
       }
