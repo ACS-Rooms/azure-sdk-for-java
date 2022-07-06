@@ -12,6 +12,7 @@ import com.azure.core.http.rest.Response;
 import com.azure.core.util.Context;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Client for rooms operations with Azure Communication Rooms Service
@@ -33,8 +34,8 @@ public class RoomsClient {
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, List<RoomParticipant> participants) {
-        return roomsAsyncClient.createRoom(validFrom, validUntil, participants).block();
+    public CommunicationRoom createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, List<RoomParticipant> participants,  UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
+        return roomsAsyncClient.createRoom(validFrom, validUntil, participants, repeatabilityRequestId, repeatabilityFirstSent).block();
     }
 
     /**
@@ -47,8 +48,8 @@ public class RoomsClient {
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, List<RoomParticipant> participants, Context context) {
-        return roomsAsyncClient.createRoomWithResponse(validFrom, validUntil, participants, context).block();
+    public Response<CommunicationRoom> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, List<RoomParticipant> participants,  UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
+        return roomsAsyncClient.createRoomWithResponse(validFrom, validUntil, participants, repeatabilityRequestId, repeatabilityFirstSent).block();
     }
 
     /**

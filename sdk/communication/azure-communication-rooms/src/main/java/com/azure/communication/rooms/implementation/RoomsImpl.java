@@ -4,9 +4,13 @@
 
 package com.azure.communication.rooms.implementation;
 
+import com.azure.communication.rooms.implementation.models.AddParticipantsRequest;
 import com.azure.communication.rooms.implementation.models.CommunicationErrorResponseException;
 import com.azure.communication.rooms.implementation.models.CreateRoomRequest;
+import com.azure.communication.rooms.implementation.models.ParticipantsCollection;
+import com.azure.communication.rooms.implementation.models.RemoveParticipantsRequest;
 import com.azure.communication.rooms.implementation.models.RoomModel;
+import com.azure.communication.rooms.implementation.models.UpdateParticipantsRequest;
 import com.azure.communication.rooms.implementation.models.UpdateRoomRequest;
 import com.azure.core.annotation.BodyParam;
 import com.azure.core.annotation.Delete;
@@ -28,9 +32,6 @@ import com.azure.core.http.rest.RestProxy;
 import com.azure.core.util.Context;
 import com.azure.core.util.FluxUtil;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
 
@@ -58,27 +59,21 @@ public final class RoomsImpl {
      */
     @Host("{endpoint}")
     @ServiceInterface(name = "AzureCommunicationRo")
-    private interface RoomsService {
+    public interface RoomsService {
         @Post("/rooms")
         @ExpectedResponses({201})
-        @UnexpectedResponseExceptionType(
-                value = CommunicationErrorResponseException.class,
-                code = {400, 401, 403, 500, 501, 412})
         @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
         Mono<Response<RoomModel>> createRoom(
                 @HostParam("endpoint") String endpoint,
                 @QueryParam("api-version") String apiVersion,
+                @HeaderParam("Repeatability-Request-ID") UUID repeatabilityRequestID,
+                @HeaderParam("Repeatability-First-Sent") OffsetDateTime repeatabilityFirstSent,
                 @BodyParam("application/json") CreateRoomRequest createRoomRequest,
                 @HeaderParam("Accept") String accept,
-                @HeaderParam("repeatability-request-id") String repeatabilityRequestId,
-                @HeaderParam("repeatability-first-sent") String repeatabilityFirstSent,
                 Context context);
 
         @Get("/rooms/{roomId}")
         @ExpectedResponses({200})
-        @UnexpectedResponseExceptionType(
-                value = CommunicationErrorResponseException.class,
-                code = {400, 401, 403, 500})
         @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
         Mono<Response<RoomModel>> getRoom(
                 @HostParam("endpoint") String endpoint,
@@ -89,23 +84,17 @@ public final class RoomsImpl {
 
         @Patch("/rooms/{roomId}")
         @ExpectedResponses({200})
-        @UnexpectedResponseExceptionType(
-                value = CommunicationErrorResponseException.class,
-                code = {400, 401, 403, 500})
         @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
         Mono<Response<RoomModel>> updateRoom(
                 @HostParam("endpoint") String endpoint,
                 @PathParam("roomId") String roomId,
                 @QueryParam("api-version") String apiVersion,
-                @BodyParam("application/merge-patch+json") UpdateRoomRequest patchRoomRequest,
+                @BodyParam("application/json") UpdateRoomRequest patchRoomRequest,
                 @HeaderParam("Accept") String accept,
                 Context context);
 
         @Delete("/rooms/{roomId}")
         @ExpectedResponses({204})
-        @UnexpectedResponseExceptionType(
-                value = CommunicationErrorResponseException.class,
-                code = {400, 401, 403, 500})
         @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
         Mono<Response<Void>> deleteRoom(
                 @HostParam("endpoint") String endpoint,
@@ -113,36 +102,81 @@ public final class RoomsImpl {
                 @QueryParam("api-version") String apiVersion,
                 @HeaderParam("Accept") String accept,
                 Context context);
+
+        @Get("/rooms/{roomId}/participants")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
+        Mono<Response<ParticipantsCollection>> getParticipants(
+                @HostParam("endpoint") String endpoint,
+                @PathParam("roomId") String roomId,
+                @QueryParam("api-version") String apiVersion,
+                @HeaderParam("Accept") String accept,
+                Context context);
+
+        @Post("/rooms/{roomId}/participants:add")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
+        Mono<Response<ParticipantsCollection>> addParticipants(
+                @HostParam("endpoint") String endpoint,
+                @PathParam("roomId") String roomId,
+                @QueryParam("api-version") String apiVersion,
+                @BodyParam("application/json") AddParticipantsRequest addParticipantsRequest,
+                @HeaderParam("Accept") String accept,
+                Context context);
+
+        @Post("/rooms/{roomId}/participants:update")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
+        Mono<Response<ParticipantsCollection>> updateParticipants(
+                @HostParam("endpoint") String endpoint,
+                @PathParam("roomId") String roomId,
+                @QueryParam("api-version") String apiVersion,
+                @BodyParam("application/json") UpdateParticipantsRequest updateParticipantsRequest,
+                @HeaderParam("Accept") String accept,
+                Context context);
+
+        @Post("/rooms/{roomId}/participants:remove")
+        @ExpectedResponses({200})
+        @UnexpectedResponseExceptionType(CommunicationErrorResponseException.class)
+        Mono<Response<ParticipantsCollection>> removeParticipants(
+                @HostParam("endpoint") String endpoint,
+                @PathParam("roomId") String roomId,
+                @QueryParam("api-version") String apiVersion,
+                @BodyParam("application/json") RemoveParticipantsRequest removeParticipantsRequest,
+                @HeaderParam("Accept") String accept,
+                Context context);
     }
 
     /**
      * Creates a new room.
      *
      * @param createRoomRequest The create room request body.
+     * @param repeatabilityRequestID If specified, the client directs that the request is repeatable; that is, that the
+     *     client can make the request multiple times with the same Repeatability-Request-Id and get back an appropriate
+     *     response without the server executing the request multiple times. The value of the Repeatability-Request-Id
+     *     is an opaque string representing a client-generated, globally unique for all time, identifier for the
+     *     request. It is recommended to use version 4 (random) UUIDs.
+     * @param repeatabilityFirstSent If Repeatability-Request-ID header is specified, then Repeatability-First-Sent
+     *     header must also be specified. The value should be the date and time at which the request was first created,
+     *     expressed using the IMF-fixdate form of HTTP-date.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500, 501, 412.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response} on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<Response<RoomModel>> createRoomWithResponseAsync(CreateRoomRequest createRoomRequest) {
-        final String accept = "application/json, text/json";
-        String repeatabilityRequestId = UUID.randomUUID().toString();
-        String repeatabilityFirstSent =
-                DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
-                        .withZone(ZoneId.of("GMT"))
-                        .format(OffsetDateTime.now());
+    public Mono<Response<RoomModel>> createRoomWithResponseAsync(
+            CreateRoomRequest createRoomRequest, UUID repeatabilityRequestID, OffsetDateTime repeatabilityFirstSent) {
+        final String accept = "application/json";
         return FluxUtil.withContext(
                 context ->
                         service.createRoom(
                                 this.client.getEndpoint(),
                                 this.client.getApiVersion(),
+                                repeatabilityRequestID,
+                                repeatabilityFirstSent,
                                 createRoomRequest,
                                 accept,
-                                repeatabilityRequestId,
-                                repeatabilityFirstSent,
                                 context));
     }
 
@@ -150,29 +184,34 @@ public final class RoomsImpl {
      * Creates a new room.
      *
      * @param createRoomRequest The create room request body.
+     * @param repeatabilityRequestID If specified, the client directs that the request is repeatable; that is, that the
+     *     client can make the request multiple times with the same Repeatability-Request-Id and get back an appropriate
+     *     response without the server executing the request multiple times. The value of the Repeatability-Request-Id
+     *     is an opaque string representing a client-generated, globally unique for all time, identifier for the
+     *     request. It is recommended to use version 4 (random) UUIDs.
+     * @param repeatabilityFirstSent If Repeatability-Request-ID header is specified, then Repeatability-First-Sent
+     *     header must also be specified. The value should be the date and time at which the request was first created,
+     *     expressed using the IMF-fixdate form of HTTP-date.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500, 501, 412.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response} on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<Response<RoomModel>> createRoomWithResponseAsync(CreateRoomRequest createRoomRequest, Context context) {
-        final String accept = "application/json, text/json";
-        String repeatabilityRequestId = UUID.randomUUID().toString();
-        String repeatabilityFirstSent =
-                DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
-                        .withZone(ZoneId.of("GMT"))
-                        .format(OffsetDateTime.now());
+    public Mono<Response<RoomModel>> createRoomWithResponseAsync(
+            CreateRoomRequest createRoomRequest,
+            UUID repeatabilityRequestID,
+            OffsetDateTime repeatabilityFirstSent,
+            Context context) {
+        final String accept = "application/json";
         return service.createRoom(
                 this.client.getEndpoint(),
                 this.client.getApiVersion(),
+                repeatabilityRequestID,
+                repeatabilityFirstSent,
                 createRoomRequest,
                 accept,
-                repeatabilityRequestId,
-                repeatabilityFirstSent,
                 context);
     }
 
@@ -180,16 +219,47 @@ public final class RoomsImpl {
      * Creates a new room.
      *
      * @param createRoomRequest The create room request body.
+     * @param repeatabilityRequestID If specified, the client directs that the request is repeatable; that is, that the
+     *     client can make the request multiple times with the same Repeatability-Request-Id and get back an appropriate
+     *     response without the server executing the request multiple times. The value of the Repeatability-Request-Id
+     *     is an opaque string representing a client-generated, globally unique for all time, identifier for the
+     *     request. It is recommended to use version 4 (random) UUIDs.
+     * @param repeatabilityFirstSent If Repeatability-Request-ID header is specified, then Repeatability-First-Sent
+     *     header must also be specified. The value should be the date and time at which the request was first created,
+     *     expressed using the IMF-fixdate form of HTTP-date.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500, 501, 412.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room on successful completion of {@link Mono}.
+     * @return the meeting room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<RoomModel> createRoomAsync(
+            CreateRoomRequest createRoomRequest, UUID repeatabilityRequestID, OffsetDateTime repeatabilityFirstSent) {
+        return createRoomWithResponseAsync(createRoomRequest, repeatabilityRequestID, repeatabilityFirstSent)
+                .flatMap(
+                        (Response<RoomModel> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Creates a new room.
+     *
+     * @param createRoomRequest The create room request body.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<RoomModel> createRoomAsync(CreateRoomRequest createRoomRequest) {
-        return createRoomWithResponseAsync(createRoomRequest)
+        final UUID repeatabilityRequestID = null;
+        final OffsetDateTime repeatabilityFirstSent = null;
+        return createRoomWithResponseAsync(createRoomRequest, repeatabilityRequestID, repeatabilityFirstSent)
                 .flatMap(
                         (Response<RoomModel> res) -> {
                             if (res.getValue() != null) {
@@ -204,17 +274,27 @@ public final class RoomsImpl {
      * Creates a new room.
      *
      * @param createRoomRequest The create room request body.
+     * @param repeatabilityRequestID If specified, the client directs that the request is repeatable; that is, that the
+     *     client can make the request multiple times with the same Repeatability-Request-Id and get back an appropriate
+     *     response without the server executing the request multiple times. The value of the Repeatability-Request-Id
+     *     is an opaque string representing a client-generated, globally unique for all time, identifier for the
+     *     request. It is recommended to use version 4 (random) UUIDs.
+     * @param repeatabilityFirstSent If Repeatability-Request-ID header is specified, then Repeatability-First-Sent
+     *     header must also be specified. The value should be the date and time at which the request was first created,
+     *     expressed using the IMF-fixdate form of HTTP-date.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500, 501, 412.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<RoomModel> createRoomAsync(CreateRoomRequest createRoomRequest, Context context) {
-        return createRoomWithResponseAsync(createRoomRequest, context)
+    public Mono<RoomModel> createRoomAsync(
+            CreateRoomRequest createRoomRequest,
+            UUID repeatabilityRequestID,
+            OffsetDateTime repeatabilityFirstSent,
+            Context context) {
+        return createRoomWithResponseAsync(createRoomRequest, repeatabilityRequestID, repeatabilityFirstSent, context)
                 .flatMap(
                         (Response<RoomModel> res) -> {
                             if (res.getValue() != null) {
@@ -229,49 +309,81 @@ public final class RoomsImpl {
      * Creates a new room.
      *
      * @param createRoomRequest The create room request body.
+     * @param repeatabilityRequestID If specified, the client directs that the request is repeatable; that is, that the
+     *     client can make the request multiple times with the same Repeatability-Request-Id and get back an appropriate
+     *     response without the server executing the request multiple times. The value of the Repeatability-Request-Id
+     *     is an opaque string representing a client-generated, globally unique for all time, identifier for the
+     *     request. It is recommended to use version 4 (random) UUIDs.
+     * @param repeatabilityFirstSent If Repeatability-Request-ID header is specified, then Repeatability-First-Sent
+     *     header must also be specified. The value should be the date and time at which the request was first created,
+     *     expressed using the IMF-fixdate form of HTTP-date.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500, 501, 412.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the meeting room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public RoomModel createRoom(
+            CreateRoomRequest createRoomRequest, UUID repeatabilityRequestID, OffsetDateTime repeatabilityFirstSent) {
+        return createRoomAsync(createRoomRequest, repeatabilityRequestID, repeatabilityFirstSent).block();
+    }
+
+    /**
+     * Creates a new room.
+     *
+     * @param createRoomRequest The create room request body.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public RoomModel createRoom(CreateRoomRequest createRoomRequest) {
-        return createRoomAsync(createRoomRequest).block();
+        final UUID repeatabilityRequestID = null;
+        final OffsetDateTime repeatabilityFirstSent = null;
+        return createRoomAsync(createRoomRequest, repeatabilityRequestID, repeatabilityFirstSent).block();
     }
 
     /**
      * Creates a new room.
      *
      * @param createRoomRequest The create room request body.
+     * @param repeatabilityRequestID If specified, the client directs that the request is repeatable; that is, that the
+     *     client can make the request multiple times with the same Repeatability-Request-Id and get back an appropriate
+     *     response without the server executing the request multiple times. The value of the Repeatability-Request-Id
+     *     is an opaque string representing a client-generated, globally unique for all time, identifier for the
+     *     request. It is recommended to use version 4 (random) UUIDs.
+     * @param repeatabilityFirstSent If Repeatability-Request-ID header is specified, then Repeatability-First-Sent
+     *     header must also be specified. The value should be the date and time at which the request was first created,
+     *     expressed using the IMF-fixdate form of HTTP-date.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500, 501, 412.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<RoomModel> createRoomWithResponse(CreateRoomRequest createRoomRequest, Context context) {
-        return createRoomWithResponseAsync(createRoomRequest, context).block();
+    public Response<RoomModel> createRoomWithResponse(
+            CreateRoomRequest createRoomRequest,
+            UUID repeatabilityRequestID,
+            OffsetDateTime repeatabilityFirstSent,
+            Context context) {
+        return createRoomWithResponseAsync(createRoomRequest, repeatabilityRequestID, repeatabilityFirstSent, context)
+                .block();
     }
 
     /**
-     * Retrieves an existing room by Id.
+     * Retrieves an existing room by id.
      *
      * @param roomId The id of the room requested.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response} on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<RoomModel>> getRoomWithResponseAsync(String roomId) {
-        final String accept = "application/json, text/json";
+        final String accept = "application/json";
         return FluxUtil.withContext(
                 context ->
                         service.getRoom(
@@ -279,33 +391,29 @@ public final class RoomsImpl {
     }
 
     /**
-     * Retrieves an existing room by Id.
+     * Retrieves an existing room by id.
      *
      * @param roomId The id of the room requested.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response} on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<RoomModel>> getRoomWithResponseAsync(String roomId, Context context) {
-        final String accept = "application/json, text/json";
+        final String accept = "application/json";
         return service.getRoom(this.client.getEndpoint(), roomId, this.client.getApiVersion(), accept, context);
     }
 
     /**
-     * Retrieves an existing room by Id.
+     * Retrieves an existing room by id.
      *
      * @param roomId The id of the room requested.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<RoomModel> getRoomAsync(String roomId) {
@@ -321,16 +429,14 @@ public final class RoomsImpl {
     }
 
     /**
-     * Retrieves an existing room by Id.
+     * Retrieves an existing room by id.
      *
      * @param roomId The id of the room requested.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<RoomModel> getRoomAsync(String roomId, Context context) {
@@ -346,13 +452,11 @@ public final class RoomsImpl {
     }
 
     /**
-     * Retrieves an existing room by Id.
+     * Retrieves an existing room by id.
      *
      * @param roomId The id of the room requested.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the meeting room.
      */
@@ -362,16 +466,14 @@ public final class RoomsImpl {
     }
 
     /**
-     * Retrieves an existing room by Id.
+     * Retrieves an existing room by id.
      *
      * @param roomId The id of the room requested.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<RoomModel> getRoomWithResponse(String roomId, Context context) {
@@ -382,17 +484,15 @@ public final class RoomsImpl {
      * Update a room with given changes.
      *
      * @param roomId The id of the room requested.
-     * @param patchRoomRequest Request payload for updating a room.
+     * @param patchRoomRequest The patch room request.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response} on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<RoomModel>> updateRoomWithResponseAsync(String roomId, UpdateRoomRequest patchRoomRequest) {
-        final String accept = "application/json, text/json";
+        final String accept = "application/json";
         return FluxUtil.withContext(
                 context ->
                         service.updateRoom(
@@ -408,19 +508,17 @@ public final class RoomsImpl {
      * Update a room with given changes.
      *
      * @param roomId The id of the room requested.
-     * @param patchRoomRequest Request payload for updating a room.
+     * @param patchRoomRequest The patch room request.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response} on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<RoomModel>> updateRoomWithResponseAsync(
             String roomId, UpdateRoomRequest patchRoomRequest, Context context) {
-        final String accept = "application/json, text/json";
+        final String accept = "application/json";
         return service.updateRoom(
                 this.client.getEndpoint(), roomId, this.client.getApiVersion(), patchRoomRequest, accept, context);
     }
@@ -429,13 +527,11 @@ public final class RoomsImpl {
      * Update a room with given changes.
      *
      * @param roomId The id of the room requested.
-     * @param patchRoomRequest Request payload for updating a room.
+     * @param patchRoomRequest The patch room request.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<RoomModel> updateRoomAsync(String roomId, UpdateRoomRequest patchRoomRequest) {
@@ -454,14 +550,35 @@ public final class RoomsImpl {
      * Update a room with given changes.
      *
      * @param roomId The id of the room requested.
-     * @param patchRoomRequest Request payload for updating a room.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the meeting room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<RoomModel> updateRoomAsync(String roomId) {
+        final UpdateRoomRequest patchRoomRequest = null;
+        return updateRoomWithResponseAsync(roomId, patchRoomRequest)
+                .flatMap(
+                        (Response<RoomModel> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Update a room with given changes.
+     *
+     * @param roomId The id of the room requested.
+     * @param patchRoomRequest The patch room request.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room on successful completion of {@link Mono}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<RoomModel> updateRoomAsync(String roomId, UpdateRoomRequest patchRoomRequest, Context context) {
@@ -480,11 +597,9 @@ public final class RoomsImpl {
      * Update a room with given changes.
      *
      * @param roomId The id of the room requested.
-     * @param patchRoomRequest Request payload for updating a room.
+     * @param patchRoomRequest The patch room request.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      * @return the meeting room.
      */
@@ -497,14 +612,27 @@ public final class RoomsImpl {
      * Update a room with given changes.
      *
      * @param roomId The id of the room requested.
-     * @param patchRoomRequest Request payload for updating a room.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return the meeting room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public RoomModel updateRoom(String roomId) {
+        final UpdateRoomRequest patchRoomRequest = null;
+        return updateRoomAsync(roomId, patchRoomRequest).block();
+    }
+
+    /**
+     * Update a room with given changes.
+     *
+     * @param roomId The id of the room requested.
+     * @param patchRoomRequest The patch room request.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the meeting room along with {@link Response}.
+     * @return the meeting room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<RoomModel> updateRoomWithResponse(
@@ -515,13 +643,11 @@ public final class RoomsImpl {
     /**
      * Delete a room.
      *
-     * @param roomId The id of the room requested.
+     * @param roomId The id of the room to be deleted.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link Response} on successful completion of {@link Mono}.
+     * @return the completion.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<Void>> deleteRoomWithResponseAsync(String roomId) {
@@ -535,14 +661,12 @@ public final class RoomsImpl {
     /**
      * Delete a room.
      *
-     * @param roomId The id of the room requested.
+     * @param roomId The id of the room to be deleted.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link Response} on successful completion of {@link Mono}.
+     * @return the completion.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<Void>> deleteRoomWithResponseAsync(String roomId, Context context) {
@@ -553,13 +677,11 @@ public final class RoomsImpl {
     /**
      * Delete a room.
      *
-     * @param roomId The id of the room requested.
+     * @param roomId The id of the room to be deleted.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return A {@link Mono} that completes when a successful response is received.
+     * @return the completion.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Void> deleteRoomAsync(String roomId) {
@@ -569,14 +691,12 @@ public final class RoomsImpl {
     /**
      * Delete a room.
      *
-     * @param roomId The id of the room requested.
+     * @param roomId The id of the room to be deleted.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return A {@link Mono} that completes when a successful response is received.
+     * @return the completion.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Void> deleteRoomAsync(String roomId, Context context) {
@@ -586,11 +706,9 @@ public final class RoomsImpl {
     /**
      * Delete a room.
      *
-     * @param roomId The id of the room requested.
+     * @param roomId The id of the room to be deleted.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
@@ -601,17 +719,515 @@ public final class RoomsImpl {
     /**
      * Delete a room.
      *
-     * @param roomId The id of the room requested.
+     * @param roomId The id of the room to be deleted.
      * @param context The context to associate with this operation.
      * @throws IllegalArgumentException thrown if parameters fail the validation.
      * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
-     * @throws CommunicationErrorResponseException thrown if the request is rejected by server on status code 400, 401,
-     *     403, 500.
      * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
-     * @return the {@link Response}.
+     * @return the response.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<Void> deleteRoomWithResponse(String roomId, Context context) {
         return deleteRoomWithResponseAsync(roomId, context).block();
+    }
+
+    /**
+     * Get participants in a room.
+     *
+     * @param roomId The id of the room to get participants from.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> getParticipantsWithResponseAsync(String roomId) {
+        final String accept = "application/json";
+        return FluxUtil.withContext(
+                context ->
+                        service.getParticipants(
+                                this.client.getEndpoint(), roomId, this.client.getApiVersion(), accept, context));
+    }
+
+    /**
+     * Get participants in a room.
+     *
+     * @param roomId The id of the room to get participants from.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> getParticipantsWithResponseAsync(String roomId, Context context) {
+        final String accept = "application/json";
+        return service.getParticipants(this.client.getEndpoint(), roomId, this.client.getApiVersion(), accept, context);
+    }
+
+    /**
+     * Get participants in a room.
+     *
+     * @param roomId The id of the room to get participants from.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> getParticipantsAsync(String roomId) {
+        return getParticipantsWithResponseAsync(roomId)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Get participants in a room.
+     *
+     * @param roomId The id of the room to get participants from.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> getParticipantsAsync(String roomId, Context context) {
+        return getParticipantsWithResponseAsync(roomId, context)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Get participants in a room.
+     *
+     * @param roomId The id of the room to get participants from.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public ParticipantsCollection getParticipants(String roomId) {
+        return getParticipantsAsync(roomId).block();
+    }
+
+    /**
+     * Get participants in a room.
+     *
+     * @param roomId The id of the room to get participants from.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<ParticipantsCollection> getParticipantsWithResponse(String roomId, Context context) {
+        return getParticipantsWithResponseAsync(roomId, context).block();
+    }
+
+    /**
+     * Adds participants to a room. If participants already exist, no change occurs.
+     *
+     * @param roomId Room id to add participants.
+     * @param addParticipantsRequest Participants to be added to the room.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> addParticipantsWithResponseAsync(
+            String roomId, AddParticipantsRequest addParticipantsRequest) {
+        final String accept = "application/json";
+        return FluxUtil.withContext(
+                context ->
+                        service.addParticipants(
+                                this.client.getEndpoint(),
+                                roomId,
+                                this.client.getApiVersion(),
+                                addParticipantsRequest,
+                                accept,
+                                context));
+    }
+
+    /**
+     * Adds participants to a room. If participants already exist, no change occurs.
+     *
+     * @param roomId Room id to add participants.
+     * @param addParticipantsRequest Participants to be added to the room.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> addParticipantsWithResponseAsync(
+            String roomId, AddParticipantsRequest addParticipantsRequest, Context context) {
+        final String accept = "application/json";
+        return service.addParticipants(
+                this.client.getEndpoint(),
+                roomId,
+                this.client.getApiVersion(),
+                addParticipantsRequest,
+                accept,
+                context);
+    }
+
+    /**
+     * Adds participants to a room. If participants already exist, no change occurs.
+     *
+     * @param roomId Room id to add participants.
+     * @param addParticipantsRequest Participants to be added to the room.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> addParticipantsAsync(
+            String roomId, AddParticipantsRequest addParticipantsRequest) {
+        return addParticipantsWithResponseAsync(roomId, addParticipantsRequest)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Adds participants to a room. If participants already exist, no change occurs.
+     *
+     * @param roomId Room id to add participants.
+     * @param addParticipantsRequest Participants to be added to the room.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> addParticipantsAsync(
+            String roomId, AddParticipantsRequest addParticipantsRequest, Context context) {
+        return addParticipantsWithResponseAsync(roomId, addParticipantsRequest, context)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Adds participants to a room. If participants already exist, no change occurs.
+     *
+     * @param roomId Room id to add participants.
+     * @param addParticipantsRequest Participants to be added to the room.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public ParticipantsCollection addParticipants(String roomId, AddParticipantsRequest addParticipantsRequest) {
+        return addParticipantsAsync(roomId, addParticipantsRequest).block();
+    }
+
+    /**
+     * Adds participants to a room. If participants already exist, no change occurs.
+     *
+     * @param roomId Room id to add participants.
+     * @param addParticipantsRequest Participants to be added to the room.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<ParticipantsCollection> addParticipantsWithResponse(
+            String roomId, AddParticipantsRequest addParticipantsRequest, Context context) {
+        return addParticipantsWithResponseAsync(roomId, addParticipantsRequest, context).block();
+    }
+
+    /**
+     * Update participants in a room.
+     *
+     * @param roomId The room id.
+     * @param updateParticipantsRequest Participants in a room to be updated.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> updateParticipantsWithResponseAsync(
+            String roomId, UpdateParticipantsRequest updateParticipantsRequest) {
+        final String accept = "application/json";
+        return FluxUtil.withContext(
+                context ->
+                        service.updateParticipants(
+                                this.client.getEndpoint(),
+                                roomId,
+                                this.client.getApiVersion(),
+                                updateParticipantsRequest,
+                                accept,
+                                context));
+    }
+
+    /**
+     * Update participants in a room.
+     *
+     * @param roomId The room id.
+     * @param updateParticipantsRequest Participants in a room to be updated.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> updateParticipantsWithResponseAsync(
+            String roomId, UpdateParticipantsRequest updateParticipantsRequest, Context context) {
+        final String accept = "application/json";
+        return service.updateParticipants(
+                this.client.getEndpoint(),
+                roomId,
+                this.client.getApiVersion(),
+                updateParticipantsRequest,
+                accept,
+                context);
+    }
+
+    /**
+     * Update participants in a room.
+     *
+     * @param roomId The room id.
+     * @param updateParticipantsRequest Participants in a room to be updated.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> updateParticipantsAsync(
+            String roomId, UpdateParticipantsRequest updateParticipantsRequest) {
+        return updateParticipantsWithResponseAsync(roomId, updateParticipantsRequest)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Update participants in a room.
+     *
+     * @param roomId The room id.
+     * @param updateParticipantsRequest Participants in a room to be updated.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> updateParticipantsAsync(
+            String roomId, UpdateParticipantsRequest updateParticipantsRequest, Context context) {
+        return updateParticipantsWithResponseAsync(roomId, updateParticipantsRequest, context)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Update participants in a room.
+     *
+     * @param roomId The room id.
+     * @param updateParticipantsRequest Participants in a room to be updated.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public ParticipantsCollection updateParticipants(
+            String roomId, UpdateParticipantsRequest updateParticipantsRequest) {
+        return updateParticipantsAsync(roomId, updateParticipantsRequest).block();
+    }
+
+    /**
+     * Update participants in a room.
+     *
+     * @param roomId The room id.
+     * @param updateParticipantsRequest Participants in a room to be updated.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<ParticipantsCollection> updateParticipantsWithResponse(
+            String roomId, UpdateParticipantsRequest updateParticipantsRequest, Context context) {
+        return updateParticipantsWithResponseAsync(roomId, updateParticipantsRequest, context).block();
+    }
+
+    /**
+     * Remove participants from a room.
+     *
+     * @param roomId Room id to remove the participants from.
+     * @param removeParticipantsRequest Participants in a room to be removed.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> removeParticipantsWithResponseAsync(
+            String roomId, RemoveParticipantsRequest removeParticipantsRequest) {
+        final String accept = "application/json";
+        return FluxUtil.withContext(
+                context ->
+                        service.removeParticipants(
+                                this.client.getEndpoint(),
+                                roomId,
+                                this.client.getApiVersion(),
+                                removeParticipantsRequest,
+                                accept,
+                                context));
+    }
+
+    /**
+     * Remove participants from a room.
+     *
+     * @param roomId Room id to remove the participants from.
+     * @param removeParticipantsRequest Participants in a room to be removed.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> removeParticipantsWithResponseAsync(
+            String roomId, RemoveParticipantsRequest removeParticipantsRequest, Context context) {
+        final String accept = "application/json";
+        return service.removeParticipants(
+                this.client.getEndpoint(),
+                roomId,
+                this.client.getApiVersion(),
+                removeParticipantsRequest,
+                accept,
+                context);
+    }
+
+    /**
+     * Remove participants from a room.
+     *
+     * @param roomId Room id to remove the participants from.
+     * @param removeParticipantsRequest Participants in a room to be removed.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> removeParticipantsAsync(
+            String roomId, RemoveParticipantsRequest removeParticipantsRequest) {
+        return removeParticipantsWithResponseAsync(roomId, removeParticipantsRequest)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Remove participants from a room.
+     *
+     * @param roomId Room id to remove the participants from.
+     * @param removeParticipantsRequest Participants in a room to be removed.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> removeParticipantsAsync(
+            String roomId, RemoveParticipantsRequest removeParticipantsRequest, Context context) {
+        return removeParticipantsWithResponseAsync(roomId, removeParticipantsRequest, context)
+                .flatMap(
+                        (Response<ParticipantsCollection> res) -> {
+                            if (res.getValue() != null) {
+                                return Mono.just(res.getValue());
+                            } else {
+                                return Mono.empty();
+                            }
+                        });
+    }
+
+    /**
+     * Remove participants from a room.
+     *
+     * @param roomId Room id to remove the participants from.
+     * @param removeParticipantsRequest Participants in a room to be removed.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public ParticipantsCollection removeParticipants(
+            String roomId, RemoveParticipantsRequest removeParticipantsRequest) {
+        return removeParticipantsAsync(roomId, removeParticipantsRequest).block();
+    }
+
+    /**
+     * Remove participants from a room.
+     *
+     * @param roomId Room id to remove the participants from.
+     * @param removeParticipantsRequest Participants in a room to be removed.
+     * @param context The context to associate with this operation.
+     * @throws IllegalArgumentException thrown if parameters fail the validation.
+     * @throws CommunicationErrorResponseException thrown if the request is rejected by server.
+     * @throws RuntimeException all other wrapped checked exceptions if the request fails to be sent.
+     * @return collection of participants in a room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<ParticipantsCollection> removeParticipantsWithResponse(
+            String roomId, RemoveParticipantsRequest removeParticipantsRequest, Context context) {
+        return removeParticipantsWithResponseAsync(roomId, removeParticipantsRequest, context).block();
     }
 }

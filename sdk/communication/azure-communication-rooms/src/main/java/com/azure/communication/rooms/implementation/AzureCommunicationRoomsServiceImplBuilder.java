@@ -23,17 +23,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** A builder for creating a new instance of the AzureCommunicationRoomService type. */
-@ServiceClientBuilder(serviceClients = {AzureCommunicationRoomServiceImpl.class})
-public final class AzureCommunicationRoomServiceImplBuilder {
+/** A builder for creating a new instance of the AzureCommunicationRoomsService type. */
+@ServiceClientBuilder(serviceClients = {AzureCommunicationRoomsServiceImpl.class})
+public final class AzureCommunicationRoomsServiceImplBuilder {
     private static final String SDK_NAME = "name";
 
     private static final String SDK_VERSION = "version";
 
     private final Map<String, String> properties = new HashMap<>();
 
-    /** Create an instance of the AzureCommunicationRoomServiceImplBuilder. */
-    public AzureCommunicationRoomServiceImplBuilder() {
+    /** Create an instance of the AzureCommunicationRoomsServiceImplBuilder. */
+    public AzureCommunicationRoomsServiceImplBuilder() {
         this.pipelinePolicies = new ArrayList<>();
     }
 
@@ -46,9 +46,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The endpoint of the Azure Communication resource.
      *
      * @param endpoint the endpoint value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder endpoint(String endpoint) {
+    public AzureCommunicationRoomsServiceImplBuilder endpoint(String endpoint) {
         this.endpoint = endpoint;
         return this;
     }
@@ -62,9 +62,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets Api Version.
      *
      * @param apiVersion the apiVersion value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder apiVersion(String apiVersion) {
+    public AzureCommunicationRoomsServiceImplBuilder apiVersion(String apiVersion) {
         this.apiVersion = apiVersion;
         return this;
     }
@@ -78,9 +78,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The HTTP pipeline to send requests through.
      *
      * @param pipeline the pipeline value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder pipeline(HttpPipeline pipeline) {
+    public AzureCommunicationRoomsServiceImplBuilder pipeline(HttpPipeline pipeline) {
         this.pipeline = pipeline;
         return this;
     }
@@ -94,9 +94,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The serializer to serialize an object into a string.
      *
      * @param serializerAdapter the serializerAdapter value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder serializerAdapter(SerializerAdapter serializerAdapter) {
+    public AzureCommunicationRoomsServiceImplBuilder serializerAdapter(SerializerAdapter serializerAdapter) {
         this.serializerAdapter = serializerAdapter;
         return this;
     }
@@ -110,9 +110,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The HTTP client used to send the request.
      *
      * @param httpClient the httpClient value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder httpClient(HttpClient httpClient) {
+    public AzureCommunicationRoomsServiceImplBuilder httpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
         return this;
     }
@@ -127,9 +127,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The configuration store that is used during construction of the service client.
      *
      * @param configuration the configuration value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder configuration(Configuration configuration) {
+    public AzureCommunicationRoomsServiceImplBuilder configuration(Configuration configuration) {
         this.configuration = configuration;
         return this;
     }
@@ -143,9 +143,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The logging configuration for HTTP requests and responses.
      *
      * @param httpLogOptions the httpLogOptions value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder httpLogOptions(HttpLogOptions httpLogOptions) {
+    public AzureCommunicationRoomsServiceImplBuilder httpLogOptions(HttpLogOptions httpLogOptions) {
         this.httpLogOptions = httpLogOptions;
         return this;
     }
@@ -160,9 +160,9 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Sets The retry policy that will attempt to retry failed requests, if applicable.
      *
      * @param retryPolicy the retryPolicy value.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder retryPolicy(RetryPolicy retryPolicy) {
+    public AzureCommunicationRoomsServiceImplBuilder retryPolicy(RetryPolicy retryPolicy) {
         this.retryPolicy = retryPolicy;
         return this;
     }
@@ -176,19 +176,19 @@ public final class AzureCommunicationRoomServiceImplBuilder {
      * Adds a custom Http pipeline policy.
      *
      * @param customPolicy The custom Http pipeline policy to add.
-     * @return the AzureCommunicationRoomServiceImplBuilder.
+     * @return the AzureCommunicationRoomsServiceImplBuilder.
      */
-    public AzureCommunicationRoomServiceImplBuilder addPolicy(HttpPipelinePolicy customPolicy) {
+    public AzureCommunicationRoomsServiceImplBuilder addPolicy(HttpPipelinePolicy customPolicy) {
         pipelinePolicies.add(customPolicy);
         return this;
     }
 
     /**
-     * Builds an instance of AzureCommunicationRoomServiceImpl with the provided parameters.
+     * Builds an instance of AzureCommunicationRoomsServiceImpl with the provided parameters.
      *
-     * @return an instance of AzureCommunicationRoomServiceImpl.
+     * @return an instance of AzureCommunicationRoomsServiceImpl.
      */
-    public AzureCommunicationRoomServiceImpl buildClient() {
+    public AzureCommunicationRoomsServiceImpl buildClient() {
         if (apiVersion == null) {
             this.apiVersion = "2022-02-01";
         }
@@ -198,8 +198,8 @@ public final class AzureCommunicationRoomServiceImplBuilder {
         if (serializerAdapter == null) {
             this.serializerAdapter = JacksonAdapter.createDefaultSerializerAdapter();
         }
-        AzureCommunicationRoomServiceImpl client =
-                new AzureCommunicationRoomServiceImpl(pipeline, serializerAdapter, endpoint, apiVersion);
+        AzureCommunicationRoomsServiceImpl client =
+                new AzureCommunicationRoomsServiceImpl(pipeline, serializerAdapter, endpoint, apiVersion);
         return client;
     }
 

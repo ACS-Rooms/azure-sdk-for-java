@@ -13,26 +13,26 @@ public final class CommunicationErrorResponse {
     /*
      * The Communication Services error.
      */
-    @JsonProperty(value = "communicationError", required = true)
-    private CommunicationError communicationError;
+    @JsonProperty(value = "error", required = true)
+    private CommunicationError error;
 
     /**
-     * Get the communicationError property: The Communication Services error.
+     * Get the error property: The Communication Services error.
      *
-     * @return the communicationError value.
+     * @return the error value.
      */
-    public CommunicationError getCommunicationError() {
-        return this.communicationError;
+    public CommunicationError getError() {
+        return this.error;
     }
 
     /**
-     * Set the communicationError property: The Communication Services error.
+     * Set the error property: The Communication Services error.
      *
-     * @param communicationError the communicationError value to set.
+     * @param error the error value to set.
      * @return the CommunicationErrorResponse object itself.
      */
-    public CommunicationErrorResponse setCommunicationError(CommunicationError communicationError) {
-        this.communicationError = communicationError;
+    public CommunicationErrorResponse setError(CommunicationError error) {
+        this.error = error;
         return this;
     }
 }

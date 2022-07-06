@@ -7,9 +7,9 @@ package com.azure.communication.rooms.implementation.models;
 import com.azure.core.annotation.Fluent;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
-import java.util.Map;
+import java.util.List;
 
-/** The create room request body. */
+/** Request payload for creating new room. */
 @Fluent
 public final class CreateRoomRequest {
     /*
@@ -27,10 +27,16 @@ public final class CreateRoomRequest {
     private OffsetDateTime validUntil;
 
     /*
-     * (Optional) Collection of identities invited to the room.
+     * The Policy based on which Participants can join a room.
+     */
+    @JsonProperty(value = "roomJoinPolicy")
+    private RoomJoinPolicy roomJoinPolicy;
+
+    /*
+     * (Optional) Collection of participants invited to the room.
      */
     @JsonProperty(value = "participants")
-    private Map<String, RoomParticipantInternal> participants;
+    private List<RoomParticipant> participants;
 
     /**
      * Get the validFrom property: The timestamp from when the room is open for joining. The timestamp is in RFC3339
@@ -77,21 +83,41 @@ public final class CreateRoomRequest {
     }
 
     /**
-     * Get the participants property: (Optional) Collection of identities invited to the room.
+     * Get the roomJoinPolicy property: The Policy based on which Participants can join a room.
+     *
+     * @return the roomJoinPolicy value.
+     */
+    public RoomJoinPolicy getRoomJoinPolicy() {
+        return this.roomJoinPolicy;
+    }
+
+    /**
+     * Set the roomJoinPolicy property: The Policy based on which Participants can join a room.
+     *
+     * @param roomJoinPolicy the roomJoinPolicy value to set.
+     * @return the CreateRoomRequest object itself.
+     */
+    public CreateRoomRequest setRoomJoinPolicy(RoomJoinPolicy roomJoinPolicy) {
+        this.roomJoinPolicy = roomJoinPolicy;
+        return this;
+    }
+
+    /**
+     * Get the participants property: (Optional) Collection of participants invited to the room.
      *
      * @return the participants value.
      */
-    public Map<String, RoomParticipantInternal> getParticipants() {
+    public List<RoomParticipant> getParticipants() {
         return this.participants;
     }
 
     /**
-     * Set the participants property: (Optional) Collection of identities invited to the room.
+     * Set the participants property: (Optional) Collection of participants invited to the room.
      *
      * @param participants the participants value to set.
      * @return the CreateRoomRequest object itself.
      */
-    public CreateRoomRequest setParticipants(Map<String, RoomParticipantInternal> participants) {
+    public CreateRoomRequest setParticipants(List<RoomParticipant> participants) {
         this.participants = participants;
         return this;
     }
