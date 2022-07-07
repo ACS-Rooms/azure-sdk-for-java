@@ -4,6 +4,7 @@
 package com.azure.communication.rooms;
 
 import com.azure.communication.rooms.models.CommunicationRoom;
+import com.azure.communication.rooms.models.ParticipantsCollection;
 import com.azure.communication.rooms.models.RoomParticipant;
 import com.azure.core.annotation.ReturnType;
 import com.azure.core.annotation.ServiceClient;
@@ -61,8 +62,8 @@ public class RoomsClient {
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil) {
-        return roomsAsyncClient.updateRoom(roomId, validFrom, validUntil).block();
+    public CommunicationRoom updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, List<RoomParticipant> participants) {
+        return roomsAsyncClient.updateRoom(roomId, validFrom, validUntil, participants).block();
     }
 
     /**
@@ -75,8 +76,8 @@ public class RoomsClient {
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, Context context) {
-        return roomsAsyncClient.updateRoomWithResponse(roomId, validFrom, validUntil, context).block();
+    public Response<CommunicationRoom> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, List<RoomParticipant> participants) {
+        return roomsAsyncClient.updateRoomWithResponse(roomId, validFrom, validUntil, participants).block();
     }
 
     /**
@@ -123,7 +124,7 @@ public class RoomsClient {
      * @return The existing room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom addParticipants(String roomId, List<RoomParticipant> participants) {
+    public ParticipantsCollection addParticipants(String roomId, List<RoomParticipant> participants) {
         return roomsAsyncClient.addParticipants(roomId, participants).block();
     }
 
@@ -136,7 +137,7 @@ public class RoomsClient {
      * @return The existing room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> addParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
+    public Response<ParticipantsCollection> addParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
         return roomsAsyncClient.addParticipantsWithResponse(roomId, participants, context).block();
     }
 
@@ -148,7 +149,7 @@ public class RoomsClient {
      * @return The existing room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom updateParticipants(String roomId, List<RoomParticipant> participants) {
+    public ParticipantsCollection updateParticipants(String roomId, List<RoomParticipant> participants) {
         return roomsAsyncClient.updateParticipants(roomId, participants).block();
     }
 
@@ -161,7 +162,7 @@ public class RoomsClient {
      * @return The existing room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> updateParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
+    public Response<ParticipantsCollection> updateParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
         return roomsAsyncClient.updateParticipantsWithResponse(roomId, participants, context).block();
     }
 
@@ -173,7 +174,7 @@ public class RoomsClient {
      * @return The existing room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom removeParticipants(String roomId, List<RoomParticipant> participants) {
+    public ParticipantsCollection removeParticipants(String roomId, List<RoomParticipant> participants) {
         return roomsAsyncClient.removeParticipants(roomId, participants).block();
     }
 
@@ -186,30 +187,7 @@ public class RoomsClient {
      * @return The existing room.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> removeParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
+    public Response<ParticipantsCollection> removeParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
         return roomsAsyncClient.removeParticipantsWithResponse(roomId, participants, context).block();
-    }
-
-    /**
-     * Remove all participants from an existing room.
-     *
-     * @param roomId The room id.
-     * @return The existing room.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom removeAllParticipants(String roomId) {
-        return roomsAsyncClient.removeAllParticipants(roomId).block();
-    }
-
-    /**
-     * Remove all participants from an existing room with response.
-     *
-     * @param roomId The room id.
-     * @param context The context of key value pairs for http request.
-     * @return The existing room.
-     */
-    @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> removeAllParticipantsWithResponse(String roomId, Context context) {
-        return roomsAsyncClient.removeAllParticipantsWithResponse(roomId, context).block();
     }
 }

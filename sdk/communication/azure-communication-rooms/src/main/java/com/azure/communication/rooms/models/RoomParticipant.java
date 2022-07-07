@@ -3,70 +3,69 @@
 
 package com.azure.communication.rooms.models;
 
+import com.azure.communication.common.CommunicationIdentifier;
+import com.azure.core.annotation.Fluent;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /** The RoomParticipant model. */
-public class RoomParticipant {
-    private final String identifier;
-    private final String roleName;
+@Fluent
+public final class RoomParticipant {
+    /*
+     * Identifies a participant in Azure Communication services. A participant
+     * is, for example, a phone number or an Azure communication user. This
+     * model must be interpreted as a union: Apart from rawId, at most one
+     * further property may be set.
+     */
+    @JsonProperty(value = "communicationIdentifier", required = true)
+    private CommunicationIdentifier communicationIdentifier;
+
+    /*
+     * The Role of a room participant.
+     */
+    @JsonProperty(value = "role")
+    private RoleType role;
 
     /**
-     * The default constructor of RoomParticipant.
+     * Get the communicationIdentifier property: Identifies a participant in Azure Communication services. A participant
+     * is, for example, a phone number or an Azure communication user. This model must be interpreted as a union: Apart
+     * from rawId, at most one further property may be set.
      *
-     * @param identifier The Participant MRI Id.
-     * @param roleName The role name of the participant.
+     * @return the communicationIdentifier value.
      */
-    public RoomParticipant(String identifier, String roleName) {
-        this.identifier = identifier;
-        this.roleName = roleName;
+    public CommunicationIdentifier getCommunicationIdentifier() {
+        return this.communicationIdentifier;
     }
 
     /**
-     * Get the identifier of a participant.
+     * Set the communicationIdentifier property: Identifies a participant in Azure Communication services. A participant
+     * is, for example, a phone number or an Azure communication user. This model must be interpreted as a union: Apart
+     * from rawId, at most one further property may be set.
      *
-     * @return The mri identifier string of the participant.
+     * @param communicationIdentifier the communicationIdentifier value to set.
+     * @return the RoomParticipant object itself.
      */
-    public String getIdentifier() {
-        return identifier;
+    public  RoomParticipant setCommunicationIdentifier(CommunicationIdentifier communicationIdentifier) {
+        this.communicationIdentifier = communicationIdentifier;
+        return this;
     }
 
     /**
-     * Get the role name of a participant.
+     * Get the role property: The Role of a room participant.
      *
-     * @return The participant role name.
+     * @return the role value.
      */
-    public String getRoleName() {
-        return roleName;
+    public RoleType getRole() {
+        return this.role;
     }
 
     /**
-     * Compare the participant.
+     * Set the role property: The Role of a room participant.
      *
-     * @return The equality of participant.
+     * @param role the role value to set.
+     * @return the RoomParticipant object itself.
      */
-    @Override
-    public boolean equals(Object p) {
-        if (p == this) {
-            return true;
-        }
-
-        if (!(p instanceof RoomParticipant)) {
-            return false;
-        }
-
-        RoomParticipant o = (RoomParticipant) p;
-
-        return this.identifier.equals(o.getIdentifier()) && this.roleName.equals(o.getRoleName());
-    }
-
-    /**
-     * Hash the participant.
-     *
-     * @return The hashcode of participant.
-     */
-    @Override
-    public int hashCode() {
-        int result = 17;
-        result = 31 * result + this.identifier.hashCode();
-        result = 31 * result + this.roleName.hashCode();
-        return result;
+    public RoomParticipant setRole(RoleType role) {
+        this.role = role;
+        return this;
     }
 }
