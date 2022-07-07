@@ -57,6 +57,8 @@ public class RoomsAsyncClient {
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
      * @param participants the participants value to set.
+     * @param repeatabilityRequestId repeatabilityRequestId.
+     * @param repeatabilityFirstSent repeatabilityFirstSent.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
@@ -120,6 +122,7 @@ public class RoomsAsyncClient {
      * @param roomId The room id.
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
+     * @param participants the participants value to set.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
@@ -147,6 +150,7 @@ public class RoomsAsyncClient {
      * @param roomId The room id.
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
+     * @param participants the participants value to set.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)

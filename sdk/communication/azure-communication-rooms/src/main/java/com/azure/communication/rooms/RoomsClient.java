@@ -32,6 +32,8 @@ public class RoomsClient {
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
      * @param participants the participants value to set.
+     * @param repeatabilityRequestId repeatabilityRequestId.
+     * @param repeatabilityFirstSent repeatabilityFirstSent.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
@@ -45,7 +47,8 @@ public class RoomsClient {
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
      * @param participants the participants value to set.
-     * @param context The context of key value pairs for http request.
+     * @param repeatabilityRequestId repeatabilityRequestId.
+     * @param repeatabilityFirstSent repeatabilityFirstSent.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
@@ -59,6 +62,7 @@ public class RoomsClient {
      * @param roomId The room id.
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
+     * @param participants the participants value to set.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
@@ -72,7 +76,7 @@ public class RoomsClient {
      * @param roomId The room id.
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
-     * @param context The context of key value pairs for http request.
+     * @param participants the participants value to set.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
