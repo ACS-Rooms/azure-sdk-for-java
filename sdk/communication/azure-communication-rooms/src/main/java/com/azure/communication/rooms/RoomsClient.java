@@ -5,7 +5,7 @@ package com.azure.communication.rooms;
 
 import com.azure.communication.rooms.models.CommunicationRoom;
 import com.azure.communication.rooms.models.ParticipantsCollection;
-import com.azure.communication.rooms.models.RoomJoinPolicy;
+import com.azure.communication.rooms.implementation.models.RoomJoinPolicy;
 import com.azure.communication.rooms.models.RoomParticipant;
 import com.azure.core.annotation.ReturnType;
 import com.azure.core.annotation.ServiceClient;
@@ -71,7 +71,7 @@ public class RoomsClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public CommunicationRoom updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return roomsAsyncClient.updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants).block();
+        return roomsAsyncClient.updateRoom(roomId, validFrom, validUntil, roomJoinPolicy).block();
     }
 
     /**
@@ -86,7 +86,7 @@ public class RoomsClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<CommunicationRoom> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return roomsAsyncClient.updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants).block();
+        return roomsAsyncClient.updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy).block();
     }
 
     /**

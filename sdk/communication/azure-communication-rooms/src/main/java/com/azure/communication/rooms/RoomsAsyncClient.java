@@ -69,7 +69,7 @@ public class RoomsAsyncClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<CommunicationRoom> createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
-        return createRoom(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent);
+        return createRoom(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent, null);
     }
 
     Mono<CommunicationRoom> createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent, Context context) {
@@ -80,7 +80,7 @@ public class RoomsAsyncClient {
 
         try {
             return this.roomsClient
-            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), repeatabilityRequestId, repeatabilityFirstSent)
+            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), repeatabilityRequestId, repeatabilityFirstSent, null)
             .flatMap((Response<RoomModel> response) -> {
                 return Mono.just(getCommunicationRoomFromResponse(response.getValue()));
             });
@@ -101,11 +101,11 @@ public class RoomsAsyncClient {
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return createRoomWithResponse(validFrom, validUntil, roomJoinPolicy, participants, null);
+    public Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
+        return createRoomWithResponse(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent, null);
     }
 
-    Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
+    Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent, Context context) {
         context = context == null ? Context.NONE : context;
 
         repeatabilityRequestId = repeatabilityRequestId == null ? UUID.randomUUID() : repeatabilityRequestId;
@@ -113,7 +113,7 @@ public class RoomsAsyncClient {
 
         try {
             return this.roomsClient
-            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), repeatabilityRequestId, repeatabilityFirstSent)
+            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), repeatabilityRequestId, repeatabilityFirstSent, null)
             .flatMap((Response<RoomModel> response) -> {
                 CommunicationRoom communicationRoom = getCommunicationRoomFromResponse(response.getValue());
                 return Mono.just(new SimpleResponse<CommunicationRoom>(response, communicationRoom));
@@ -141,7 +141,7 @@ public class RoomsAsyncClient {
         context = context == null ? Context.NONE : context;
         try {
             return this.roomsClient
-            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, null, false), context)
+            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, null), context)
             .flatMap((Response<RoomModel> response) -> {
                 return Mono.just(getCommunicationRoomFromResponse(response.getValue()));
             });
@@ -169,7 +169,7 @@ public class RoomsAsyncClient {
         context = context == null ? Context.NONE : context;
         try {
             return this.roomsClient
-            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, null, false), context)
+            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, null), context)
             .flatMap((Response<RoomModel> response) -> {
                 CommunicationRoom communicationRoom = getCommunicationRoomFromResponse(response.getValue());
                 return Mono.just(new SimpleResponse<CommunicationRoom>(response, communicationRoom));
@@ -519,9 +519,11 @@ public class RoomsAsyncClient {
             createRoomRequest.setValidUntil(validUntil);
         }
 
-        if (joinPolicy != null) {
+        if (roomJoinPolicy != null) {
             createRoomRequest.setRoomJoinPolicy(roomJoinPolicy);
         }
+
+        List<com.azure.communication.rooms.implementation.models.RoomParticipant> roomParticipants = new ArrayList<>();
 
         if (participants != null) {
             roomParticipants = participants
@@ -553,9 +555,11 @@ public class RoomsAsyncClient {
             updateRoomRequest.setValidUntil(validUntil);
         }
 
-        if (joinPolicy != null) {
+        if (roomJoinPolicy != null) {
             updateRoomRequest.setRoomJoinPolicy(roomJoinPolicy);
         }
+
+        List<com.azure.communication.rooms.implementation.models.RoomParticipant> roomParticipants = new ArrayList<>();
 
         if (participants != null) {
             roomParticipants = participants
@@ -586,10 +590,6 @@ public class RoomsAsyncClient {
                 .stream()
                 .map((participant) -> RoomParticipantConverter.convert(participant))
                 .collect(Collectors.toList());
-        }
-
-        if (joinPolicy != null) {
-            updateRoomRequest.setRoomJoinPolicy(RoomJoinPolicy.fromString(joinPolicy.toString()));
         }
 
         if (participants != null) {

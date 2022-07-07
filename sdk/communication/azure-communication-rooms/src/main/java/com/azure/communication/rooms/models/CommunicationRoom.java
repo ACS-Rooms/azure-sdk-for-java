@@ -6,6 +6,7 @@ package com.azure.communication.rooms.models;
 import java.time.OffsetDateTime;
 import java.util.List;
 import com.azure.core.annotation.Immutable;
+import com.azure.communication.rooms.implementation.models.RoomJoinPolicy;
 
 /** The CommunicationRoom model. */
 @Immutable
