@@ -63,24 +63,19 @@ public class RoomsAsyncClient {
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
      * @param participants the participants value to set.
-     * @param repeatabilityRequestId repeatabilityRequestId.
-     * @param repeatabilityFirstSent repeatabilityFirstSent.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<CommunicationRoom> createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
-        return createRoom(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent, null);
+    public Mono<CommunicationRoom> createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
+        return createRoom(validFrom, validUntil, roomJoinPolicy, participants, null);
     }
 
-    Mono<CommunicationRoom> createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent, Context context) {
+    Mono<CommunicationRoom> createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
         context = context == null ? Context.NONE : context;
-
-        repeatabilityRequestId = repeatabilityRequestId == null ? UUID.randomUUID() : repeatabilityRequestId;
-        repeatabilityFirstSent = repeatabilityFirstSent == null ? OffsetDateTime.now(ZoneOffset.UTC) : repeatabilityFirstSent;
 
         try {
             return this.roomsClient
-            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), repeatabilityRequestId, repeatabilityFirstSent, null)
+            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), context)
             .flatMap((Response<RoomModel> response) -> {
                 return Mono.just(getCommunicationRoomFromResponse(response.getValue()));
             });
@@ -96,24 +91,19 @@ public class RoomsAsyncClient {
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
      * @param participants the participants value to set.
-     * @param repeatabilityRequestId repeatabilityRequestId.
-     * @param repeatabilityFirstSent repeatabilityFirstSent.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
-        return createRoomWithResponse(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent, null);
+    public Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
+        return createRoomWithResponse(validFrom, validUntil, roomJoinPolicy, participants, null);
     }
 
-    Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent, Context context) {
+    Mono<Response<CommunicationRoom>> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
         context = context == null ? Context.NONE : context;
-
-        repeatabilityRequestId = repeatabilityRequestId == null ? UUID.randomUUID() : repeatabilityRequestId;
-        repeatabilityFirstSent = repeatabilityFirstSent == null ? OffsetDateTime.now(ZoneOffset.UTC) : repeatabilityFirstSent;
 
         try {
             return this.roomsClient
-            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), repeatabilityRequestId, repeatabilityFirstSent, null)
+            .createRoomWithResponseAsync(toCreateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), context)
             .flatMap((Response<RoomModel> response) -> {
                 CommunicationRoom communicationRoom = getCommunicationRoomFromResponse(response.getValue());
                 return Mono.just(new SimpleResponse<CommunicationRoom>(response, communicationRoom));
@@ -130,18 +120,19 @@ public class RoomsAsyncClient {
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
+     * @param participants the participants value to set.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy) {
-        return updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, null);
+    public Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
+        return updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants);
     }
 
-    Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, Context context) {
+    Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
         context = context == null ? Context.NONE : context;
         try {
             return this.roomsClient
-            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, null), context)
+            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), context)
             .flatMap((Response<RoomModel> response) -> {
                 return Mono.just(getCommunicationRoomFromResponse(response.getValue()));
             });
@@ -158,18 +149,19 @@ public class RoomsAsyncClient {
      * @param validFrom the validFrom value to set.
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
+     * @param participants the participants value to set.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy) {
-        return updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, null);
+    public Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
+        return updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants);
     }
 
-    Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, Context context) {
+    Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
         context = context == null ? Context.NONE : context;
         try {
             return this.roomsClient
-            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, null), context)
+            .updateRoomWithResponseAsync(roomId, toUpdateRoomRequest(validFrom, validUntil, roomJoinPolicy, participants), context)
             .flatMap((Response<RoomModel> response) -> {
                 CommunicationRoom communicationRoom = getCommunicationRoomFromResponse(response.getValue());
                 return Mono.just(new SimpleResponse<CommunicationRoom>(response, communicationRoom));

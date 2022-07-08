@@ -27,7 +27,11 @@ public final class RoomJoinPolicy extends ExpandableStringEnum<RoomJoinPolicy> {
         return fromString(name, RoomJoinPolicy.class);
     }
 
-    /** @return known RoomJoinPolicy values. */
+    /**
+     * Gets known RoomJoinPolicy values.
+     *
+     * @return known RoomJoinPolicy values.
+     */
     public static Collection<RoomJoinPolicy> values() {
         return values(RoomJoinPolicy.class);
     }

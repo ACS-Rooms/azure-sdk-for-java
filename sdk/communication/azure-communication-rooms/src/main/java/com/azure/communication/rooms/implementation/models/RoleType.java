@@ -30,7 +30,11 @@ public final class RoleType extends ExpandableStringEnum<RoleType> {
         return fromString(name, RoleType.class);
     }
 
-    /** @return known RoleType values. */
+    /**
+     * Gets known RoleType values.
+     *
+     * @return known RoleType values.
+     */
     public static Collection<RoleType> values() {
         return values(RoleType.class);
     }

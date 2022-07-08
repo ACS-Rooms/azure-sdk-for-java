@@ -34,13 +34,11 @@ public class RoomsClient {
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
      * @param participants the participants value to set.
-     * @param repeatabilityRequestId repeatabilityRequestId.
-     * @param repeatabilityFirstSent repeatabilityFirstSent.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public CommunicationRoom createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants,  UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
-        return roomsAsyncClient.createRoom(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent).block();
+    public CommunicationRoom createRoom(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
+        return roomsAsyncClient.createRoom(validFrom, validUntil, roomJoinPolicy, participants).block();
     }
 
     /**
@@ -50,13 +48,12 @@ public class RoomsClient {
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
      * @param participants the participants value to set.
-     * @param repeatabilityRequestId repeatabilityRequestId.
-     * @param repeatabilityFirstSent repeatabilityFirstSent.
+     * @param context The context of key value pairs for http request.
      * @return response for a successful create room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants,  UUID repeatabilityRequestId, OffsetDateTime repeatabilityFirstSent) {
-        return roomsAsyncClient.createRoomWithResponse(validFrom, validUntil, roomJoinPolicy, participants, repeatabilityRequestId, repeatabilityFirstSent).block();
+    public Response<CommunicationRoom> createRoomWithResponse(OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
+        return roomsAsyncClient.createRoomWithResponse(validFrom, validUntil, roomJoinPolicy, participants, context).block();
     }
 
     /**
@@ -71,7 +68,7 @@ public class RoomsClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public CommunicationRoom updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return roomsAsyncClient.updateRoom(roomId, validFrom, validUntil, roomJoinPolicy).block();
+        return roomsAsyncClient.updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants).block();
     }
 
     /**
@@ -82,11 +79,12 @@ public class RoomsClient {
      * @param validUntil the validUntil value to set.
      * @param roomJoinPolicy the roomJoinPolicy value to set.
      * @param participants the participants value to set.
+     * @param context The context of key value pairs for http request.
      * @return response for a successful update room request.
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
-    public Response<CommunicationRoom> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return roomsAsyncClient.updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy).block();
+    public Response<CommunicationRoom> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
+        return roomsAsyncClient.updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants, context).block();
     }
 
     /**
