@@ -4,6 +4,7 @@
 
 package com.azure.communication.rooms.implementation.models;
 
+import com.azure.communication.rooms.models.RoomJoinPolicy;
 import com.azure.core.annotation.Fluent;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;

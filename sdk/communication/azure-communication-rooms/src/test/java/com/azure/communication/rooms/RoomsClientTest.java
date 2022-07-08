@@ -4,7 +4,7 @@
 package com.azure.communication.rooms;
 
 import com.azure.communication.rooms.models.CommunicationRoom;
-import com.azure.communication.rooms.implementation.models.RoomJoinPolicy;
+import com.azure.communication.rooms.models.RoomJoinPolicy;
 import com.azure.core.exception.HttpResponseException;
 import com.azure.core.http.HttpClient;
 import com.azure.core.http.rest.Response;
