@@ -24,21 +24,21 @@ public final class CommunicationError {
     private String message;
 
     /*
-     * If applicable, would be used to indicate the property causing the error.
+     * The error target.
      */
-    @JsonProperty(value = "target")
+    @JsonProperty(value = "target", access = JsonProperty.Access.WRITE_ONLY)
     private String target;
 
     /*
      * Further details about specific errors that led to this error.
      */
-    @JsonProperty(value = "details")
+    @JsonProperty(value = "details", access = JsonProperty.Access.WRITE_ONLY)
     private List<CommunicationError> details;
 
     /*
-     * The Communication Services error.
+     * The inner error if any.
      */
-    @JsonProperty(value = "innerError")
+    @JsonProperty(value = "innererror", access = JsonProperty.Access.WRITE_ONLY)
     private CommunicationError innerError;
 
     /**
@@ -82,23 +82,12 @@ public final class CommunicationError {
     }
 
     /**
-     * Get the target property: If applicable, would be used to indicate the property causing the error.
+     * Get the target property: The error target.
      *
      * @return the target value.
      */
     public String getTarget() {
         return this.target;
-    }
-
-    /**
-     * Set the target property: If applicable, would be used to indicate the property causing the error.
-     *
-     * @param target the target value to set.
-     * @return the CommunicationError object itself.
-     */
-    public CommunicationError setTarget(String target) {
-        this.target = target;
-        return this;
     }
 
     /**
@@ -111,33 +100,11 @@ public final class CommunicationError {
     }
 
     /**
-     * Set the details property: Further details about specific errors that led to this error.
-     *
-     * @param details the details value to set.
-     * @return the CommunicationError object itself.
-     */
-    public CommunicationError setDetails(List<CommunicationError> details) {
-        this.details = details;
-        return this;
-    }
-
-    /**
-     * Get the innerError property: The Communication Services error.
+     * Get the innerError property: The inner error if any.
      *
      * @return the innerError value.
      */
     public CommunicationError getInnerError() {
         return this.innerError;
-    }
-
-    /**
-     * Set the innerError property: The Communication Services error.
-     *
-     * @param innerError the innerError value to set.
-     * @return the CommunicationError object itself.
-     */
-    public CommunicationError setInnerError(CommunicationError innerError) {
-        this.innerError = innerError;
-        return this;
     }
 }

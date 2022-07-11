@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.azure.communication.rooms.models.CommunicationRoom;
+import com.azure.communication.rooms.models.RoomJoinPolicy;
 import com.azure.communication.rooms.models.RoomParticipant;
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.credential.TokenCredential;
@@ -73,117 +74,126 @@ public class ReadmeSamples {
         return roomsClient;
     }
 
-    public void createRoomWithValidInput() {
-        OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
-        OffsetDateTime validUntil = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
-        List<RoomParticipant> participants = new ArrayList<>();
-        // Add two participants
-        participants.add(new RoomParticipant("<ACS User MRI identity 1>", "Prebuilt Role Name"));
-        participants.add(new RoomParticipant("<ACS User MRI identity 2>", "Prebuilt Role Name"));
+    // public void createRoomWithValidInput() {
+    //     OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //     OffsetDateTime validUntil = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //     List<RoomParticipant> participants = new ArrayList<>();
+    //     // Add two participants
+    //     participants.add(new RoomParticipant("<ACS User MRI identity 1>", "Prebuilt Role Name"));
+    //     participants.add(new RoomParticipant("<ACS User MRI identity 2>", "Prebuilt Role Name"));
 
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
-        CommunicationRoom roomResult = roomsClient.createRoom(validFrom, validUntil, participants);
-        System.out.println("Room Id: " + roomResult.getRoomId());
-    }
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     CommunicationRoom roomResult = roomsClient.createRoom(validFrom, validUntil, RoomJoinPolicy.INVITE_ONLY);
+    //     System.out.println("Room Id: " + roomResult.getRoomId());
+    // }
 
-    public void updateRoomWithRoomId() {
-        OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
-        OffsetDateTime validUntil = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
-        List<RoomParticipant> participants = new ArrayList<>();
-        participants.add(new RoomParticipant("<ACS User MRI identity 1>", "Prebuilt Role Name"));
-        // Delete one participant
-        participants.add(new RoomParticipant("<ACS User MRI identity 2>", "Prebuilt Role Name"));
+    // public void createOpenRoomWithValidInput() {
+    //     OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //     OffsetDateTime validUntil = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
 
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     CommunicationRoom roomResult = roomsClient.createRoom(validFrom, validUntil, RoomJoinPolicy.COMMUNICATION_SERVICE_USERS);
+    //     System.out.println("Room Id: " + roomResult.getRoomId());
+    // }
 
-        try {
-            CommunicationRoom roomResult = roomsClient.updateRoom("<Room Id in String>", validFrom, validUntil);
-            System.out.println("Room Id: " + roomResult.getRoomId());
+    // public void updateRoomWithRoomId() {
+    //     OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //     OffsetDateTime validUntil = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //     List<RoomParticipant> participants = new ArrayList<>();
+    //     participants.add(new RoomParticipant("<ACS User MRI identity 1>", "Prebuilt Role Name"));
+    //     // Delete one participant
+    //     participants.add(new RoomParticipant("<ACS User MRI identity 2>", "Prebuilt Role Name"));
 
-        } catch (RuntimeException ex) {
-            System.out.println(ex);
-        }
-    }
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
 
-    public void getRoomWithRoomId() {
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
-        try {
-            CommunicationRoom roomResult = roomsClient.getRoom("<Room Id in String>");
-            System.out.println("Room Id: " + roomResult.getRoomId());
-        } catch (RuntimeException ex) {
-            System.out.println(ex);
-        }
+    //     try {
+    //         CommunicationRoom roomResult = roomsClient.updateRoom("<Room Id in String>", validFrom, validUntil, null, null);
+    //         System.out.println("Room Id: " + roomResult.getRoomId());
 
-    }
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex);
+    //     }
+    // }
 
-    public void deleteRoomWithRoomId() {
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
-        try {
-            roomsClient.deleteRoomWithResponse("<Room Id in String>", Context.NONE);
-        } catch (RuntimeException ex) {
-            System.out.println(ex);
-        }
-    }
+    // public void getRoomWithRoomId() {
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     try {
+    //         CommunicationRoom roomResult = roomsClient.getRoom("<Room Id in String>");
+    //         System.out.println("Room Id: " + roomResult.getRoomId());
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex);
+    //     }
 
-    public void addRoomParticipantsWithRoomId() {
-        RoomParticipant user1 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef1d_0000000e-3240-55cf-9806-113a0d001dd9", "Presenter");
-        RoomParticipant user2 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef2d_0000000e-3240-55cf-9806-113a0d001dd9", "Attendee");
-        RoomParticipant user3 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef3d_0000000e-3240-55cf-9806-113a0d001dd9", "Organizer");
+    // }
 
-        List<RoomParticipant> participants = new ArrayList<RoomParticipant>(Arrays.asList(user1, user2, user3));
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    // public void deleteRoomWithRoomId() {
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     try {
+    //         roomsClient.deleteRoomWithResponse("<Room Id in String>", Context.NONE);
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex);
+    //     }
+    // }
 
-        try {
-            CommunicationRoom addedParticipantRoom =  roomsClient.addParticipants("<Room Id>", participants);
-            System.out.println("Room Id: " + addedParticipantRoom.getRoomId());
+    // public void addRoomParticipantsWithRoomId() {
+    //     RoomParticipant user1 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef1d_0000000e-3240-55cf-9806-113a0d001dd9", "Presenter");
+    //     RoomParticipant user2 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef2d_0000000e-3240-55cf-9806-113a0d001dd9", "Attendee");
+    //     RoomParticipant user3 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef3d_0000000e-3240-55cf-9806-113a0d001dd9", "Organizer");
 
-        } catch (RuntimeException ex) {
-            System.out.println(ex);
-        }
-    }
+    //     List<RoomParticipant> participants = new ArrayList<RoomParticipant>(Arrays.asList(user1, user2, user3));
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
 
-    public void removeRoomParticipantsWithRoomId() {
-        RoomParticipant user1 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef1d_0000000e-3240-55cf-9806-113a0d001dd9", "Presenter");
-        RoomParticipant user2 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef2d_0000000e-3240-55cf-9806-113a0d001dd9", "Attendee");
+    //     try {
+    //         CommunicationRoom addedParticipantRoom =  roomsClient.addParticipants("<Room Id>", participants);
+    //         System.out.println("Room Id: " + addedParticipantRoom.getRoomId());
 
-        List<RoomParticipant> participants = new ArrayList<RoomParticipant>(Arrays.asList(user1, user2));
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex);
+    //     }
+    // }
 
-        try {
-            CommunicationRoom removedParticipantRoom =  roomsClient.removeParticipants("<Room Id>", participants);
-            System.out.println("Room Id: " + removedParticipantRoom.getRoomId());
+    // public void removeRoomParticipantsWithRoomId() {
+    //     RoomParticipant user1 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef1d_0000000e-3240-55cf-9806-113a0d001dd9", "Presenter");
+    //     RoomParticipant user2 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef2d_0000000e-3240-55cf-9806-113a0d001dd9", "Attendee");
 
-        } catch (RuntimeException ex) {
-            System.out.println(ex);
-        }
-    }
+    //     List<RoomParticipant> participants = new ArrayList<RoomParticipant>(Arrays.asList(user1, user2));
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
 
-    public void deleteAllParticipantsWithEmptyPayload() {
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
-        try {
-            CommunicationRoom deleteAllParticipantsRoom =  roomsClient.removeAllParticipants("<Room Id>");
-            System.out.println("Room Id: " + deleteAllParticipantsRoom.getRoomId());
-        } catch (RuntimeException ex) {
-            System.out.println(ex);
-        }
-    }
+    //     try {
+    //         CommunicationRoom removedParticipantRoom =  roomsClient.removeParticipants("<Room Id>", participants);
+    //         System.out.println("Room Id: " + removedParticipantRoom.getRoomId());
 
-    public void createRoomTroubleShooting() {
-        RoomsClient roomsClient = createRoomsClientWithConnectionString();
-        try {
-            OffsetDateTime validFrom = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
-            OffsetDateTime validUntil = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
-            List<RoomParticipant> participants = new ArrayList<RoomParticipant>();
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex);
+    //     }
+    // }
 
-            Response<CommunicationRoom> roomResult = roomsClient.createRoomWithResponse(validFrom, validUntil, participants, null);
+    // public void deleteAllParticipantsWithEmptyPayload() {
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     try {
+    //         CommunicationRoom deleteAllParticipantsRoom =  roomsClient.removeAllParticipants("<Room Id>");
+    //         System.out.println("Room Id: " + deleteAllParticipantsRoom.getRoomId());
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex);
+    //     }
+    // }
 
-            if (roomResult.getStatusCode() == 201) {
-                System.out.println("Successfully create the room: " + roomResult.getValue().getRoomId());
-            } else {
-                System.out.println("Error Happened at create room request: " + roomResult.getStatusCode());
-            }
-        } catch (RuntimeException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
+    // public void createRoomTroubleShooting() {
+    //     RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    //     try {
+    //         OffsetDateTime validFrom = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //         OffsetDateTime validUntil = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    //         List<RoomParticipant> participants = new ArrayList<RoomParticipant>();
+
+    //         Response<CommunicationRoom> roomResult = roomsClient.createRoomWithResponse(validFrom, validUntil, RoomJoinPolicy.INVITE_ONLY, participants, null);
+
+    //         if (roomResult.getStatusCode() == 201) {
+    //             System.out.println("Successfully create the room: " + roomResult.getValue().getRoomId());
+    //         } else {
+    //             System.out.println("Error Happened at create room request: " + roomResult.getStatusCode());
+    //         }
+    //     } catch (RuntimeException ex) {
+    //         System.out.println(ex.getMessage());
+    //     }
+    // }
 }

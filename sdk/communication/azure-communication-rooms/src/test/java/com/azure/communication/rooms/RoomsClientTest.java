@@ -4,6 +4,7 @@
 package com.azure.communication.rooms;
 
 import com.azure.communication.rooms.models.CommunicationRoom;
+import com.azure.communication.rooms.models.RoomJoinPolicy;
 import com.azure.core.exception.HttpResponseException;
 import com.azure.core.http.HttpClient;
 import com.azure.core.http.rest.Response;
@@ -36,13 +37,13 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncWithFullOperation(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithFullOperation");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createCommunicationRoom);
         assertEquals(createCommunicationRoom.getParticipants().size(), 2);
 
         String roomId = createCommunicationRoom.getRoomId();
 
-        CommunicationRoom updateCommunicationRoom = roomsClient.updateRoom(roomId, VALID_FROM, VALID_FROM.plusMonths(4));
+        CommunicationRoom updateCommunicationRoom = roomsClient.updateRoom(roomId, VALID_FROM, VALID_FROM.plusMonths(4), RoomJoinPolicy.INVITE_ONLY, null);
         assertEquals(updateCommunicationRoom.getParticipants().size(), 2);
         assertHappyPath(updateCommunicationRoom);
 
@@ -63,13 +64,13 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncWithFullOperationWithResponse(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithFullOperationWithResponse");
         assertNotNull(roomsClient);
-        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, participants4, Context.NONE);
+        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4, Context.NONE);
         assertHappyPath(createdRoomResponse, 201);
         assertEquals(createdRoomResponse.getValue().getParticipants().size(), 2);
 
         String roomId = createdRoomResponse.getValue().getRoomId();
 
-        Response<CommunicationRoom> updateRoomResponse = roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_FROM.plusMonths(4), Context.NONE);
+        Response<CommunicationRoom> updateRoomResponse = roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_FROM.plusMonths(4), RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         assertHappyPath(updateRoomResponse, 200);
 
         CommunicationRoom addCommunicationRoom = roomsClient.addParticipants(roomId, participants6);
@@ -89,7 +90,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void addParticipantsSyncWithFullOperation(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "addParticipantsSyncWithFullOperation");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, null);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, null);
         assertHappyPath(createCommunicationRoom);
         assertEquals(createCommunicationRoom.getParticipants(), Collections.EMPTY_LIST);
 
@@ -113,7 +114,7 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "addParticipantsSyncWithFullOperationWithResponse");
         assertNotNull(roomsClient);
 
-        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, null, Context.NONE);
+        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         assertHappyPath(createdRoomResponse, 201);
         assertEquals(createdRoomResponse.getValue().getParticipants(), Collections.EMPTY_LIST);
 
@@ -136,7 +137,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateParticipantsSyncWithFullOperation(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateParticipantsSyncWithFullOperation");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants2);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants2);
         assertHappyPath(createCommunicationRoom);
         assertEquals(createCommunicationRoom.getParticipants().size(), 2);
         assertEquals(createCommunicationRoom.getParticipants().contains(firstParticipant), true);
@@ -161,7 +162,7 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "updateParticipantsSyncWithFullOperationWithResponse");
         assertNotNull(roomsClient);
 
-        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, participants2, Context.NONE);
+        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants2, Context.NONE);
         assertHappyPath(createdRoomResponse, 201);
         assertEquals(createdRoomResponse.getValue().getParticipants().size(), 2);
         assertEquals(createdRoomResponse.getValue().getParticipants().contains(firstParticipant), true);
@@ -186,14 +187,14 @@ public class RoomsClientTest extends RoomsTestBase {
     public void patchMeetingValidTimeWithResponse(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "patchMeetingValidTimeWithResponse");
         assertNotNull(roomsClient);
-        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, null, participants4, Context.NONE);
+        Response<CommunicationRoom> createdRoomResponse = roomsClient.createRoomWithResponse(VALID_FROM, null, RoomJoinPolicy.INVITE_ONLY, participants4, Context.NONE);
         assertHappyPath(createdRoomResponse, 201);
         assertEquals(createdRoomResponse.getValue().getParticipants().size(), 2);
         assertEquals(createdRoomResponse.getValue().getValidFrom().getDayOfYear(), VALID_FROM.getDayOfYear());
 
         String roomId = createdRoomResponse.getValue().getRoomId();
 
-        Response<CommunicationRoom> updateRoomResponse = roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_UNTIL, Context.NONE);
+        Response<CommunicationRoom> updateRoomResponse = roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         assertHappyPath(updateRoomResponse, 200);
         assertEquals(updateRoomResponse.getValue().getParticipants().size(), 2);
         assertEquals(updateRoomResponse.getValue().getValidFrom().getDayOfYear(), VALID_FROM.getDayOfYear());
@@ -228,8 +229,24 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncNoAttributes(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncNoAttributes");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, null, null);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, null, null, null);
         assertHappyPath(createCommunicationRoom);
+        assertEquals(createCommunicationRoom.getParticipants().size(), 0);
+
+        String roomId = createCommunicationRoom.getRoomId();
+
+        Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
+        assertEquals(deleteResponse.getStatusCode(), 204);
+    }
+
+    @ParameterizedTest
+    @MethodSource("com.azure.core.test.TestBase#getHttpClients")
+    public void createRoomSyncOnlyOpenRoom(HttpClient httpClient) {
+        roomsClient = setupSyncClient(httpClient, "createRoomSyncOnlyOpenRoom");
+        assertNotNull(roomsClient);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, null, RoomJoinPolicy.COMMUNICATION_SERVICE_USERS, null);
+        assertHappyPath(createCommunicationRoom);
+        assertEquals(createCommunicationRoom.getRoomJoinPolicy(), RoomJoinPolicy.COMMUNICATION_SERVICE_USERS);
         assertEquals(createCommunicationRoom.getParticipants().size(), 0);
 
         String roomId = createCommunicationRoom.getRoomId();
@@ -243,7 +260,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncOnlyValidFrom(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncOnlyValidFrom");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, null, null);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(VALID_FROM, null, null, null);
         assertHappyPath(createCommunicationRoom);
         assertEquals(createCommunicationRoom.getParticipants().size(), 0);
         assertEquals(createCommunicationRoom.getValidFrom().getDayOfYear(), VALID_FROM.getDayOfYear());
@@ -258,7 +275,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncOnlyValidUntil(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncOnlyValidUntil");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, VALID_UNTIL, null);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, VALID_UNTIL, null, null);
         assertHappyPath(createCommunicationRoom);
         assertEquals(createCommunicationRoom.getParticipants().size(), 0);
         assertEquals(createCommunicationRoom.getValidUntil().getDayOfYear(), VALID_UNTIL.getDayOfYear());
@@ -273,7 +290,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncOnlyParticipants(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncOnlyParticipants");
         assertNotNull(roomsClient);
-        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, null, participants4);
+        CommunicationRoom createCommunicationRoom = roomsClient.createRoom(null, null, null, participants4);
         assertHappyPath(createCommunicationRoom);
         assertEquals(createCommunicationRoom.getParticipants().size(), 2);
         String roomId = createCommunicationRoom.getRoomId();
@@ -288,9 +305,9 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncOnlyValidUntilGreaterThan180");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoom(null, VALID_FROM.plusDays(181), null);
+            roomsClient.createRoom(null, VALID_FROM.plusDays(181), null, null);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -299,9 +316,9 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncOnlyValidFromGreaterThan180");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoom(VALID_FROM.plusDays(181), null, null);
+            roomsClient.createRoom(VALID_FROM.plusDays(181), null, null, null);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -310,21 +327,21 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncValidFromValidUntilGreaterThan180");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoom(VALID_FROM, VALID_FROM.plusDays(181), null);
+            roomsClient.createRoom(VALID_FROM, VALID_FROM.plusDays(181), null, null);
         });
-        
+
     }
 
-    
+
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
     public void createRoomSyncBadParticipantMri(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncBadParticipantMri");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoom(null, null, badParticipant);
+            roomsClient.createRoom(null, null, null, badParticipant);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -332,14 +349,14 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncOnlyValidFrom(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncOnlyValidFrom");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoom(roomId, VALID_FROM.plusMonths(4), null);
+            roomsClient.updateRoom(roomId, VALID_FROM.plusMonths(4), null, RoomJoinPolicy.INVITE_ONLY, null);
         });
-        
+
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
     }
@@ -349,15 +366,15 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncOnlyValidUntil(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncOnlyValidUntil");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoom(roomId, null, VALID_FROM.plusMonths(4));
+            roomsClient.updateRoom(roomId, null, VALID_FROM.plusMonths(4), RoomJoinPolicy.INVITE_ONLY, null);
         });
-        
+
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
     }
@@ -369,14 +386,14 @@ public class RoomsClientTest extends RoomsTestBase {
         assertNotNull(roomsClient);
         CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
         assertHappyPath(createdRoom);
-        
+
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoom(roomId, VALID_FROM, VALID_FROM.plusDays(181));
+            roomsClient.updateRoom(roomId, VALID_FROM, VALID_FROM.plusDays(181), null, null);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -386,43 +403,64 @@ public class RoomsClientTest extends RoomsTestBase {
         assertNotNull(roomsClient);
         CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
         assertHappyPath(createdRoom);
-        
+
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoom(roomId, VALID_FROM.plusDays(181), VALID_UNTIL);
+            roomsClient.updateRoom(roomId, VALID_FROM.plusDays(181), VALID_UNTIL, null, null);
         });
-        
+
     }
 
-    
+
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
     public void updateRoomSyncBadParticipantMri(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncBadParticipantMri");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
-        
+
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();assertThrows(HttpResponseException.class, () -> {
             roomsClient.addParticipants(roomId,  badParticipant);
         });
-        
+
     }
-    
+
+    @ParameterizedTest
+    @MethodSource("com.azure.core.test.TestBase#getHttpClients")
+    public void updateClosedRoomToOpenRoomStarted(HttpClient httpClient) {
+        roomsClient = setupSyncClient(httpClient, "updateClosedRoomToOpenRoomStarted");
+        assertNotNull(roomsClient);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
+        assertHappyPath(createdRoom);
+
+        assertEquals(createdRoom.getParticipants().size(), 2);
+
+        String roomId = createdRoom.getRoomId();
+
+        assertThrows(HttpResponseException.class, () -> {
+            roomsClient.updateRoom(roomId, VALID_FROM, VALID_UNTIL, RoomJoinPolicy.COMMUNICATION_SERVICE_USERS, null);
+        });
+
+        assertThrows(HttpResponseException.class, () -> {
+            roomsClient.updateRoom(roomId, null, VALID_UNTIL, RoomJoinPolicy.COMMUNICATION_SERVICE_USERS, null);
+        });
+    }
+
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
     public void createRoomSyncWithResponseNoAttributes(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithResponseNoAttributes");
         assertNotNull(roomsClient);
-        
-        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse( null, null, null, Context.NONE);
+
+        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse( null, null, null, null, Context.NONE);
         assertHappyPath(createCommunicationRoom, 201);
         assertEquals(createCommunicationRoom.getValue().getParticipants().size(), 0);
-        
+
         String roomId = createCommunicationRoom.getValue().getRoomId();
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
@@ -430,15 +468,32 @@ public class RoomsClientTest extends RoomsTestBase {
 
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
+    public void createRoomSyncWithResponseOnlyOpenRoom(HttpClient httpClient) {
+        roomsClient = setupSyncClient(httpClient, "createRoomSyncWithResponseOnlyOpenRoom");
+        assertNotNull(roomsClient);
+
+        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse( null, null, RoomJoinPolicy.COMMUNICATION_SERVICE_USERS, null, Context.NONE);
+        assertHappyPath(createCommunicationRoom, 201);
+        assertEquals(createCommunicationRoom.getValue().getRoomJoinPolicy(), RoomJoinPolicy.COMMUNICATION_SERVICE_USERS);
+        assertEquals(createCommunicationRoom.getValue().getParticipants().size(), 0);
+
+        String roomId = createCommunicationRoom.getValue().getRoomId();
+        Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
+        assertEquals(deleteResponse.getStatusCode(), 204);
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("com.azure.core.test.TestBase#getHttpClients")
     public void createRoomSyncWithResponseOnlyValidFrom(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithResponseOnlyValidFrom");
         assertNotNull(roomsClient);
-        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse( VALID_FROM, null, null, Context.NONE);
-        
+        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse( VALID_FROM, null, null, null, Context.NONE);
+
         assertHappyPath(createCommunicationRoom, 201);
         assertEquals(createCommunicationRoom.getValue().getParticipants().size(), 0);
         assertEquals(createCommunicationRoom.getValue().getValidFrom().getDayOfYear(), VALID_FROM.getDayOfYear());
-        
+
         String roomId = createCommunicationRoom.getValue().getRoomId();
 
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
@@ -450,12 +505,12 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncWithReponseOnlyValidUntil(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithReponseOnlyValidUntil");
         assertNotNull(roomsClient);
-        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse(null, VALID_UNTIL, null, Context.NONE);
-        
+        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse(null, VALID_UNTIL, null, null, Context.NONE);
+
         assertHappyPath(createCommunicationRoom, 201);
         assertEquals(createCommunicationRoom.getValue().getParticipants().size(), 0);
         assertEquals(createCommunicationRoom.getValue().getValidUntil().getDayOfYear(), VALID_UNTIL.getDayOfYear());
-        
+
         String roomId = createCommunicationRoom.getValue().getRoomId();
 
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
@@ -467,8 +522,8 @@ public class RoomsClientTest extends RoomsTestBase {
     public void createRoomSyncWithReponseOnlyParticipants(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithReponseOnlyParticipants");
         assertNotNull(roomsClient);
-        
-        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse(null, null, participants4, Context.NONE);
+
+        Response<CommunicationRoom> createCommunicationRoom = roomsClient.createRoomWithResponse(null, null, null, participants4, Context.NONE);
         assertHappyPath(createCommunicationRoom, 201);
         assertEquals(createCommunicationRoom.getValue().getParticipants().size(), 2);
         String roomId = createCommunicationRoom.getValue().getRoomId();
@@ -483,9 +538,9 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithReponseOnlyValidUntilGreaterThan180");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoomWithResponse(null, VALID_FROM.plusDays(181), null, Context.NONE);
+            roomsClient.createRoomWithResponse(null, VALID_FROM.plusDays(181), null, null, Context.NONE);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -494,9 +549,9 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithReponseOnlyValidFromGreaterThan180");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoomWithResponse(VALID_FROM.plusDays(181), null, null, Context.NONE);
+            roomsClient.createRoomWithResponse(VALID_FROM.plusDays(181), null, null, null, Context.NONE);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -505,21 +560,21 @@ public class RoomsClientTest extends RoomsTestBase {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithReponseValidFromValidUntilGreaterThan180");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoomWithResponse(VALID_FROM, VALID_FROM.plusDays(181), null, Context.NONE);
+            roomsClient.createRoomWithResponse(VALID_FROM, VALID_FROM.plusDays(181), null, null, Context.NONE);
         });
-        
+
     }
 
-    
+
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
     public void createRoomSyncWithResponseBadParticipantMri(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "createRoomSyncWithResponseBadParticipantMri");
         assertNotNull(roomsClient);
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.createRoomWithResponse(null, null, badParticipant, Context.NONE);
+            roomsClient.createRoomWithResponse(null, null, null, badParticipant, Context.NONE);
         });
-        
+
     }
 
     @ParameterizedTest
@@ -527,14 +582,14 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncWithReponseOnlyValidFrom(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncWithReponseOnlyValidFrom");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoomWithResponse(roomId, VALID_FROM.plusMonths(4), null, Context.NONE);
+            roomsClient.updateRoomWithResponse(roomId, VALID_FROM.plusMonths(4), null, null, null, Context.NONE);
         });
-        
+
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
     }
@@ -544,15 +599,15 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncWithReponseOnlyValidUntil(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncWithReponseOnlyValidUntil");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoomWithResponse(roomId, null, VALID_FROM.plusMonths(4), Context.NONE);
+            roomsClient.updateRoomWithResponse(roomId, null, VALID_FROM.plusMonths(4), RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         });
-        
+
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
     }
@@ -562,14 +617,14 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncWithReponseValidUntilGreaterThan180(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncValidUntilWithReponseGreaterThan180");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
-        
+
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_FROM.plusDays(181), Context.NONE);
+            roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_FROM.plusDays(181), RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         });
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
@@ -580,34 +635,34 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncWithReponseValidFromGreaterThan180(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncWithReponseValidFromGreaterThan180");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
-        
+
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
-            roomsClient.updateRoomWithResponse(roomId, VALID_FROM.plusDays(181), VALID_UNTIL, Context.NONE);
+            roomsClient.updateRoomWithResponse(roomId, VALID_FROM.plusDays(181), VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         });
-        
+
     }
 
-    
+
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
     public void updateRoomSyncWithReponseBadParticipantMri(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncWithReponseBadParticipantMri");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, RoomJoinPolicy.INVITE_ONLY, participants4);
         assertHappyPath(createdRoom);
-        
+
         assertEquals(createdRoom.getParticipants().size(), 2);
 
         String roomId = createdRoom.getRoomId();
         assertThrows(HttpResponseException.class, () -> {
             roomsClient.addParticipantsWithResponse(roomId,  badParticipant, Context.NONE);
         });
-        
+
     }
 
     private RoomsClient setupSyncClient(HttpClient httpClient, String testName) {

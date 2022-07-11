@@ -103,10 +103,25 @@ public void createRoomWithValidInput() {
     System.out.println("Room Id: " + roomResult.getRoomId());
 }
 ```
+
+### Create a new open room
+Use the `createRoom`  function to create a new Open Room on Azure Communciation Service.
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L89-L96 -->
+```java
+public void createOpenRoomWithValidInput() {
+    OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    OffsetDateTime validUntil = OffsetDateTime.of(2021, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+
+    RoomsClient roomsClient = createRoomsClientWithConnectionString();
+    CommunicationRoom roomResult = roomsClient.createRoom(validFrom, validUntil, true, null);
+    System.out.println("Room Id: " + roomResult.getRoomId());
+}
+```
+
 ### Update an existing room
 Use the `updateRoom`  function to create a new Room on Azure Communciation Service.
 
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L89-L105 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L98-L115 -->
 ```java
 ic void updateRoomWithRoomId() {
 OffsetDateTime validFrom = OffsetDateTime.of(2021, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
@@ -130,7 +145,7 @@ try {
 ### Get an existing room
 Use the `getRoom`  function to get an existing Room on Azure Communciation Service.
 
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L108-L117 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L117-L126 -->
 ```java
 public void getRoomWithRoomId() {
     RoomsClient roomsClient = createRoomsClientWithConnectionString();
@@ -147,7 +162,7 @@ public void getRoomWithRoomId() {
 ### Delete an existing room
 Use the `deleteRoomWithResponse`  function to delete an existing Room on Azure Communciation Service.
 
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L119-L126 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L128-L135 -->
 ```java
 public void deleteRoomWithRoomId() {
     RoomsClient roomsClient = createRoomsClientWithConnectionString();
@@ -162,7 +177,7 @@ public void deleteRoomWithRoomId() {
 ### Add particpants an existing room
 Use the `addParticipants`  function to add participants to an existing Room on Azure Communciation Service.
 
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L128-L143 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L137-L152 -->
 ```java
 public void addRoomParticipantsWithRoomId() {
     RoomParticipant user1 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef1d_0000000e-3240-55cf-9806-113a0d001dd9", "Presenter");
@@ -185,7 +200,7 @@ public void addRoomParticipantsWithRoomId() {
 ### Remove particpants an existing room
 Use the `removeParticipants`  function to remove participants from an existing Room on Azure Communciation Service.
 
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L145-L159 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L154-L168 -->
 ```java
 public void removeRoomParticipantsWithRoomId() {
     RoomParticipant user1 = new RoomParticipant("8:acs:b6372803-0c35-4ec0-833b-c19b798cef1d_0000000e-3240-55cf-9806-113a0d001dd9", "Presenter");
@@ -208,7 +223,7 @@ public void removeRoomParticipantsWithRoomId() {
 ### Remove all particpants from an existing room
 Use the `updateRoom`  function to remove all participants from an existing Room on Azure Communciation Service.
 
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L161-L169 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L170-L178 -->
 ```java
 public void deleteAllParticipantsWithEmptyPayload() {
     RoomsClient roomsClient = createRoomsClientWithConnectionString();
@@ -226,7 +241,7 @@ public void deleteAllParticipantsWithEmptyPayload() {
 Rooms operations will throw an exception if the request to the server fails.
 Exceptions will not be thrown if the error is caused by an individual message, only if something fails with the overall request.
 Please use the `getSuccessful()` flag to validate each individual result to verify if the message was sent.
-<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L171-L188 -->
+<!-- embedme src/samples/java/com/azure/communication/rooms/ReadmeSamples.java#L180-L198 -->
 ```java
 public void createRoomTroubleShooting() {
     RoomsClient roomsClient = createRoomsClientWithConnectionString();

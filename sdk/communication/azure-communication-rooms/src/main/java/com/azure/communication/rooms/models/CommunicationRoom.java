@@ -5,9 +5,6 @@ package com.azure.communication.rooms.models;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
-
-import com.azure.communication.rooms.implementation.models.RoomParticipantInternal;
 import com.azure.core.annotation.Immutable;
 
 /** The CommunicationRoom model. */
@@ -17,6 +14,7 @@ public final class CommunicationRoom {
     private final OffsetDateTime validFrom;
     private final OffsetDateTime validUntil;
     private final OffsetDateTime createdTime;
+    private final RoomJoinPolicy roomJoinPolicy;
     private final List<RoomParticipant> participants;
 
     /**
@@ -25,14 +23,16 @@ public final class CommunicationRoom {
      * @param roomId The Room Id.
      * @param validFrom The starting time point of the room.
      * @param validUntil The ending time point of the room.
+     * @param roomJoinPolicy The join policy of the room.
      * @param createdTime The created time point of the room.
      * @param participants The participants of the room.
      */
-    public CommunicationRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, OffsetDateTime createdTime,
+    public CommunicationRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, OffsetDateTime createdTime,
         List<RoomParticipant> participants) {
         this.roomId = roomId;
         this.validFrom = validFrom;
         this.validUntil = validUntil;
+        this.roomJoinPolicy = roomJoinPolicy;
         this.createdTime = createdTime;
         this.participants = participants;
     }
@@ -80,6 +80,15 @@ public final class CommunicationRoom {
      */
     public OffsetDateTime getCreatedTime() {
         return this.createdTime;
+    }
+
+    /**
+     * Get the join policy.
+     *
+     * @return The join policy of the room.
+     */
+    public RoomJoinPolicy getRoomJoinPolicy() {
+        return this.roomJoinPolicy;
     }
 }
 

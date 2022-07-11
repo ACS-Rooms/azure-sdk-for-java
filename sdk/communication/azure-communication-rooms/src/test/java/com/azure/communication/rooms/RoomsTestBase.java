@@ -9,7 +9,6 @@ import com.azure.communication.identity.CommunicationIdentityClient;
 import com.azure.communication.identity.CommunicationIdentityClientBuilder;
 import com.azure.communication.identity.CommunicationIdentityServiceVersion;
 import com.azure.communication.rooms.models.CommunicationRoom;
-import com.azure.communication.rooms.models.RoomParticipant;
 import com.azure.core.credential.AccessToken;
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.credential.TokenCredential;
