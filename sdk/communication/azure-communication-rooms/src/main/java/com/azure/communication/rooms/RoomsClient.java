@@ -206,7 +206,7 @@ public class RoomsClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public ParticipantsCollection listParticipants(String roomId) {
-        return roomsAsyncClient.getParticipants(roomId).block();
+        return roomsAsyncClient.getRoomParticipants(roomId).block();
     }
 
     /**
@@ -217,7 +217,7 @@ public class RoomsClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Response<ParticipantsCollection> listParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
-        return roomsAsyncClient.getParticipantsWithResponse(roomId, context).block();
+        return roomsAsyncClient.getRoomParticipantsWithResponse(roomId, context).block();
     }
 
 }
