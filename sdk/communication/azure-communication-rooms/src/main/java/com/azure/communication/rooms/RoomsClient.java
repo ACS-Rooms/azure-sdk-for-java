@@ -197,4 +197,27 @@ public class RoomsClient {
     public Response<ParticipantsCollection> removeParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
         return roomsAsyncClient.removeParticipantsWithResponse(roomId, participants, context).block();
     }
+
+    /**
+     * List Room participants.
+     *
+     * @param roomId The room id.
+     * @return Room Participants List
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public ParticipantsCollection listParticipants(String roomId) {
+        return roomsAsyncClient.getParticipants(roomId).block();
+    }
+
+    /**
+     * Update participants to an existing room with response.
+     *
+     * @param roomId The room id.
+     * @return The Room Participants list.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<ParticipantsCollection> listParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
+        return roomsAsyncClient.getParticipantsWithResponse(roomId, context).block();
+    }
+
 }

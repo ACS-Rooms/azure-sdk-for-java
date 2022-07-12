@@ -19,7 +19,6 @@ import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.util.Context;
 import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.azure.core.http.HttpResponse;
 import com.azure.core.http.rest.Response;
 
 public class ReadmeSamples {
@@ -82,7 +81,7 @@ public class ReadmeSamples {
         OffsetDateTime validFrom = OffsetDateTime.of(2022, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
         OffsetDateTime validUntil = OffsetDateTime.of(2022, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
         List<RoomParticipant> participants = new ArrayList<>();
-        // Add two participants
+        // Add participants
         participants.add(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("<ACS User MRI identity 1>")).setRole(RoleType.ATTENDEE));
         participants.add(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("<ACS User MRI identity 2>")).setRole(RoleType.CONSUMER));
         participants.add(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("<ACS User MRI identity 3>")).setRole(RoleType.ATTENDEE));
@@ -194,6 +193,31 @@ public class ReadmeSamples {
             CommunicationRoom deleteAllParticipantsRoom =  roomsClient.updateRoom("<Room Id>", null, null, null, participants);
             System.out.println("Room Id: " + deleteAllParticipantsRoom.getRoomId());
             System.out.println("No. of Participants in room: " + deleteAllParticipantsRoom.getParticipants().size());
+        } catch (RuntimeException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    public void getRoomParticipants() {
+
+        // Create Room
+        OffsetDateTime validFrom = OffsetDateTime.of(2022, 8, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+        OffsetDateTime validUntil = OffsetDateTime.of(2022, 9, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+        List<RoomParticipant> participants = new ArrayList<>();
+        // Add participants
+        participants.add(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("<ACS User MRI identity 1>")).setRole(RoleType.ATTENDEE));
+        participants.add(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("<ACS User MRI identity 2>")).setRole(RoleType.CONSUMER));
+        participants.add(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("<ACS User MRI identity 3>")).setRole(RoleType.ATTENDEE));
+
+        RoomsClient roomsClient = createRoomsClientWithConnectionString();
+        CommunicationRoom roomResult = roomsClient.createRoom(validFrom, validUntil, RoomJoinPolicy.INVITE_ONLY, participants);
+        String roomId = roomResult.getRoomId();
+        System.out.println("Room Id: " + roomResult.getRoomId());
+
+
+        try {
+            ParticipantsCollection roomParticipants =  roomsClient.listParticipants(roomId);
+            System.out.println("No. of Participants in room: " + roomParticipants.getParticipants().size());
         } catch (RuntimeException ex) {
             System.out.println(ex);
         }
