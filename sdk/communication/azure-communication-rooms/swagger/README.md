@@ -21,13 +21,13 @@ There is one swagger for Rooms management APIs.
 
 ```ps
 cd <swagger-folder>
-autorest README.md --java --v4 --use=@autorest/java@4.0.20 --use=@autorest/modelerfour@4.15.442
+autorest README.md --java --v4 --use=@autorest/java@4.0.59
 ```
 
 ## Update generated files for rooms service
 To update generated files for rooms service, run the following command
 
-> autorest README.md --java --v4 --use=@autorest/java@4.0.20 --use=@autorest/modelerfour@4.15.442
+> autorest README.md --java --v4 --use=@autorest/java@4.0.59
 
 ### Code generation settings
 ``` yaml

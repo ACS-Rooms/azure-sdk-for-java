@@ -8,7 +8,7 @@ import com.azure.communication.common.implementation.CommunicationConnectionStri
 import com.azure.communication.identity.CommunicationIdentityClient;
 import com.azure.communication.identity.CommunicationIdentityClientBuilder;
 import com.azure.communication.identity.CommunicationIdentityServiceVersion;
-import com.azure.communication.rooms.models.CommunicationRoom;
+import com.azure.communication.rooms.models.*;
 import com.azure.core.credential.AccessToken;
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.credential.TokenCredential;
@@ -19,6 +19,7 @@ import com.azure.core.test.TestMode;
 import com.azure.core.util.Configuration;
 import com.azure.core.util.CoreUtils;
 import com.azure.core.util.logging.ClientLogger;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -39,11 +40,15 @@ public class RoomsTestBase extends TestBase {
     protected static final TestMode TEST_MODE = initializeTestMode();
 
     protected static final String CONNECTION_STRING = Configuration.getGlobalConfiguration().get(
-            "COMMUNICATION_LIVETEST_STATIC_CONNECTION_STRING",
-            "endpoint=https://REDACTED.communication.azure.com/;accesskey=P2tP5RwZVFcJa3sfJvHEmGaKbemSAw2e");
+                    "COMMUNICATION_LIVETEST_STATIC_CONNECTION_STRING",
+                "endpoint=https://REDACTED.communication.azure.com/;accesskey=P2tP5RwZVFcJa3sfJvHEmGaKbemSAw2e");
+    //        "COMMUNICATION_LIVETEST_DYNAMIC_CONNECTION_STRING",
+    //        "endpoint=https://REDACTED.communication.azure.com/;accesskey=REDACTED");
 
-    protected static final OffsetDateTime VALID_FROM = OffsetDateTime.of(2022, 5, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    protected static final OffsetDateTime VALID_FROM = OffsetDateTime.of(2023, 5, 1, 5, 30, 20, 10, ZoneOffset.UTC);
     protected static final OffsetDateTime VALID_UNTIL = VALID_FROM.plusDays(30);
+
+    protected static RoomJoinPolicy roomJoinPolicy = RoomJoinPolicy.INVITE_ONLY;
 
     protected List<RoomParticipant> participants1;
     protected List<RoomParticipant> participants2;
@@ -167,16 +172,16 @@ public class RoomsTestBase extends TestBase {
         secondParticipantId = communicationClient.createUser();
         thirdParticipantId = communicationClient.createUser();
 
-        firstParticipant = new RoomParticipant(firstParticipantId.getId(), "Presenter");
-        secondParticipant = new RoomParticipant(secondParticipantId.getId(), "Attendee");
-        thirdParticipant = new RoomParticipant(thirdParticipantId.getId(), "Consumer");
+        firstParticipant = new RoomParticipant().setCommunicationIdentifier(firstParticipantId).setRole(RoleType.ATTENDEE);
+        secondParticipant = new RoomParticipant().setCommunicationIdentifier(secondParticipantId).setRole(RoleType.ATTENDEE);
+        thirdParticipant = new RoomParticipant().setCommunicationIdentifier(thirdParticipantId).setRole(RoleType.CONSUMER);
 
-        firstChangeParticipant = new RoomParticipant(firstParticipantId.getId(), "Consumer");
-        secondChangeParticipant = new RoomParticipant(firstParticipantId.getId(), "Consumer");
+        firstChangeParticipant = new RoomParticipant().setCommunicationIdentifier(firstParticipantId).setRole(RoleType.CONSUMER);
+        secondChangeParticipant = new RoomParticipant().setCommunicationIdentifier(firstParticipantId).setRole(RoleType.CONSUMER);
 
-        validateParticipant1 = new RoomParticipant(firstParticipant.getIdentifier(), null);
-        validateParticipant2 = new RoomParticipant(secondParticipant.getIdentifier(), null);
-        validateParticipant3 = new RoomParticipant(thirdParticipant.getIdentifier(), null);
+        validateParticipant1 = new RoomParticipant().setCommunicationIdentifier(firstParticipantId);
+        validateParticipant2 = new RoomParticipant().setCommunicationIdentifier(secondParticipantId);
+        validateParticipant3 = new RoomParticipant().setCommunicationIdentifier(thirdParticipantId);
 
         participants1 = Arrays.asList(firstParticipant, secondParticipant, thirdParticipant);
         participants2 = Arrays.asList(firstParticipant, secondParticipant);
@@ -185,9 +190,10 @@ public class RoomsTestBase extends TestBase {
         participants5 = Arrays.asList(firstParticipant, secondParticipant, thirdParticipant);
         participants6 = Arrays.asList(secondParticipant, thirdParticipant);
         participants7 = Arrays.asList();
-        badParticipant = Arrays.asList(new RoomParticipant("Dummy_Mri", "Consumer"));
+        badParticipant = Arrays.asList(new RoomParticipant().setCommunicationIdentifier(new CommunicationUserIdentifier("Dummy_Mri")).setRole(RoleType.CONSUMER));
         participantsWithRoleUpdates = Arrays.asList(firstChangeParticipant, secondChangeParticipant);
     }
+
     protected void cleanUpUsers() {
         communicationClient.deleteUser(firstParticipantId);
         communicationClient.deleteUser(secondParticipantId);

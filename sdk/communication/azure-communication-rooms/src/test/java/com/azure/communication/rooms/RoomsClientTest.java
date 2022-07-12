@@ -3,8 +3,7 @@
 
 package com.azure.communication.rooms;
 
-import com.azure.communication.rooms.models.CommunicationRoom;
-import com.azure.communication.rooms.models.RoomJoinPolicy;
+import com.azure.communication.rooms.models.*;
 import com.azure.core.exception.HttpResponseException;
 import com.azure.core.http.HttpClient;
 import com.azure.core.http.rest.Response;
@@ -47,9 +46,8 @@ public class RoomsClientTest extends RoomsTestBase {
         assertEquals(updateCommunicationRoom.getParticipants().size(), 2);
         assertHappyPath(updateCommunicationRoom);
 
-        CommunicationRoom addCommunicationRoom = roomsClient.addParticipants(roomId, participants6);
-        assertEquals(addCommunicationRoom.getParticipants().size(), 3);
-        assertHappyPath(addCommunicationRoom);
+        ParticipantsCollection roomParticipants = roomsClient.addParticipants(roomId, participants6);
+        assertEquals(roomParticipants.getParticipants().size(), 3);
 
         CommunicationRoom getCommunicationRoom = roomsClient.getRoom(roomId);
         assertEquals(getCommunicationRoom.getParticipants().size(), 3);
@@ -73,9 +71,8 @@ public class RoomsClientTest extends RoomsTestBase {
         Response<CommunicationRoom> updateRoomResponse = roomsClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_FROM.plusMonths(4), RoomJoinPolicy.INVITE_ONLY, null, Context.NONE);
         assertHappyPath(updateRoomResponse, 200);
 
-        CommunicationRoom addCommunicationRoom = roomsClient.addParticipants(roomId, participants6);
-        assertEquals(addCommunicationRoom.getParticipants().size(), 3);
-        assertHappyPath(addCommunicationRoom);
+        ParticipantsCollection roomParticipants = roomsClient.addParticipants(roomId, participants6);
+        assertEquals(roomParticipants.getParticipants().size(), 3);
 
         Response<CommunicationRoom> getRoomResponse = roomsClient.getRoomWithResponse(roomId, Context.NONE);
         assertHappyPath(getRoomResponse, 200);
@@ -97,12 +94,11 @@ public class RoomsClientTest extends RoomsTestBase {
         String roomId = createCommunicationRoom.getRoomId();
 
         // Add 3 participants.
-        CommunicationRoom addedParticipantsRoom = roomsClient.addParticipants(roomId, participants5);
-        assertHappyPath(addedParticipantsRoom);
-        assertEquals(addedParticipantsRoom.getParticipants().size(), 3);
-        assertEquals(addedParticipantsRoom.getParticipants().contains(firstParticipant), true);
-        assertEquals(addedParticipantsRoom.getParticipants().contains(secondParticipant), true);
-        assertEquals(addedParticipantsRoom.getParticipants().contains(thirdParticipant), true);
+        ParticipantsCollection roomParticipants = roomsClient.addParticipants(roomId, participants5);
+        assertEquals(roomParticipants.getParticipants().size(), 3);
+        assertEquals(roomParticipants.getParticipants().contains(firstParticipant), true);
+        assertEquals(roomParticipants.getParticipants().contains(secondParticipant), true);
+        assertEquals(roomParticipants.getParticipants().contains(thirdParticipant), true);
 
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
@@ -121,12 +117,12 @@ public class RoomsClientTest extends RoomsTestBase {
         String roomId = createdRoomResponse.getValue().getRoomId();
 
         // Add 3 participants.
-        Response<CommunicationRoom> addedParticipantsRoom = roomsClient.addParticipantsWithResponse(roomId, participants5, Context.NONE);
-        assertHappyPath(addedParticipantsRoom.getValue());
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().size(), 3);
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().contains(firstParticipant), true);
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().contains(secondParticipant), true);
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().contains(thirdParticipant), true);
+        Response<ParticipantsCollection> roomParticipants = roomsClient.addParticipantsWithResponse(roomId, participants5, Context.NONE);
+        assertEquals(roomParticipants.getStatusCode(), 200);
+        assertEquals(roomParticipants.getValue().getParticipants().size(), 3);
+        assertEquals(roomParticipants.getValue().getParticipants().contains(firstParticipant), true);
+        assertEquals(roomParticipants.getValue().getParticipants().contains(secondParticipant), true);
+        assertEquals(roomParticipants.getValue().getParticipants().contains(thirdParticipant), true);
 
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
@@ -146,11 +142,10 @@ public class RoomsClientTest extends RoomsTestBase {
         String roomId = createCommunicationRoom.getRoomId();
 
         // Update 2 participants.
-        CommunicationRoom addedParticipantsRoom = roomsClient.updateParticipants(roomId, participantsWithRoleUpdates);
-        assertHappyPath(addedParticipantsRoom);
-        assertEquals(addedParticipantsRoom.getParticipants().size(), 2);
-        assertEquals(addedParticipantsRoom.getParticipants().contains(firstChangeParticipant), true);
-        assertEquals(addedParticipantsRoom.getParticipants().contains(secondChangeParticipant), true);
+        ParticipantsCollection roomParticipants = roomsClient.updateParticipants(roomId, participantsWithRoleUpdates);
+        assertEquals(roomParticipants.getParticipants().size(), 2);
+        assertEquals(roomParticipants.getParticipants().contains(firstChangeParticipant), true);
+        assertEquals(roomParticipants.getParticipants().contains(secondChangeParticipant), true);
 
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
@@ -171,11 +166,11 @@ public class RoomsClientTest extends RoomsTestBase {
         String roomId = createdRoomResponse.getValue().getRoomId();
 
         // Add 3 participants.
-        Response<CommunicationRoom> addedParticipantsRoom = roomsClient.updateParticipantsWithResponse(roomId, participantsWithRoleUpdates, Context.NONE);
-        assertHappyPath(addedParticipantsRoom.getValue());
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().size(), 2);
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().contains(firstChangeParticipant), true);
-        assertEquals(addedParticipantsRoom.getValue().getParticipants().contains(secondChangeParticipant), true);
+        Response<ParticipantsCollection> participantsCollection = roomsClient.updateParticipantsWithResponse(roomId, participantsWithRoleUpdates, Context.NONE);
+        assertEquals(participantsCollection.getStatusCode(), 200);
+        assertEquals(participantsCollection.getValue().getParticipants().size(), 2);
+        assertEquals(participantsCollection.getValue().getParticipants().contains(firstChangeParticipant), true);
+        assertEquals(participantsCollection.getValue().getParticipants().contains(secondChangeParticipant), true);
 
         Response<Void> deleteResponse = roomsClient.deleteRoomWithResponse(roomId, Context.NONE);
         assertEquals(deleteResponse.getStatusCode(), 204);
@@ -384,7 +379,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncValidUntilGreaterThan180(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncValidUntilGreaterThan180");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, roomJoinPolicy, participants4);
         assertHappyPath(createdRoom);
 
         assertEquals(createdRoom.getParticipants().size(), 2);
@@ -401,7 +396,7 @@ public class RoomsClientTest extends RoomsTestBase {
     public void updateRoomSyncValidFromGreaterThan180(HttpClient httpClient) {
         roomsClient = setupSyncClient(httpClient, "updateRoomSyncValidFromGreaterThan180");
         assertNotNull(roomsClient);
-        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, participants4);
+        CommunicationRoom createdRoom = roomsClient.createRoom(VALID_FROM, VALID_UNTIL, roomJoinPolicy, participants4);
         assertHappyPath(createdRoom);
 
         assertEquals(createdRoom.getParticipants().size(), 2);
