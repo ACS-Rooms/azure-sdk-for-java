@@ -9,9 +9,6 @@ import com.azure.communication.rooms.implementation.converters.RoomParticipantCo
 import com.azure.communication.rooms.implementation.converters.RoomsErrorConverter;
 import com.azure.communication.rooms.implementation.converters.ParticipantsCollectionConverter;
 import com.azure.communication.rooms.implementation.models.RoomModel;
-import com.azure.communication.rooms.implementation.models.RoomParticipantInternal;
-import com.azure.communication.rooms.implementation.models.UpdateRoomRequest;
-import com.azure.communication.rooms.implementation.models.CreateRoomRequest;
 import com.azure.communication.rooms.models.CommunicationRoom;
 import com.azure.communication.rooms.models.RoomJoinPolicy;
 import com.azure.communication.rooms.models.RoomParticipant;
@@ -23,7 +20,6 @@ import com.azure.communication.rooms.implementation.models.AddParticipantsReques
 import com.azure.communication.rooms.implementation.models.CommunicationErrorResponseException;
 import com.azure.communication.rooms.implementation.models.CreateRoomRequest;
 import com.azure.communication.rooms.implementation.models.RemoveParticipantsRequest;
-import com.azure.communication.rooms.models.CommunicationRoom;
 import com.azure.communication.rooms.models.ParticipantsCollection;
 import com.azure.core.annotation.ReturnType;
 import com.azure.core.annotation.ServiceClient;
@@ -33,11 +29,9 @@ import com.azure.core.http.rest.SimpleResponse;
 import com.azure.core.util.Context;
 import com.azure.core.util.logging.ClientLogger;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import reactor.core.publisher.Mono;
@@ -125,7 +119,7 @@ public class RoomsAsyncClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants);
+        return updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants, null);
     }
 
     Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
@@ -154,7 +148,7 @@ public class RoomsAsyncClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants);
+        return updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants, null);
     }
 
     Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {

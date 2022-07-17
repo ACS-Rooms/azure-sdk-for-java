@@ -21,7 +21,7 @@ import com.azure.core.util.CoreUtils;
 import com.azure.core.util.logging.ClientLogger;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+// import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,10 +42,8 @@ public class RoomsTestBase extends TestBase {
     protected static final String CONNECTION_STRING = Configuration.getGlobalConfiguration().get(
                     "COMMUNICATION_LIVETEST_STATIC_CONNECTION_STRING",
                 "endpoint=https://REDACTED.communication.azure.com/;accesskey=P2tP5RwZVFcJa3sfJvHEmGaKbemSAw2e");
-    //        "COMMUNICATION_LIVETEST_DYNAMIC_CONNECTION_STRING",
-    //        "endpoint=https://REDACTED.communication.azure.com/;accesskey=REDACTED");
 
-    protected static final OffsetDateTime VALID_FROM = OffsetDateTime.of(2023, 5, 1, 5, 30, 20, 10, ZoneOffset.UTC);
+    protected static final OffsetDateTime VALID_FROM = OffsetDateTime.now();
     protected static final OffsetDateTime VALID_UNTIL = VALID_FROM.plusDays(30);
 
     protected static RoomJoinPolicy roomJoinPolicy = RoomJoinPolicy.INVITE_ONLY;
@@ -209,6 +207,7 @@ public class RoomsTestBase extends TestBase {
     }
 
     protected void assertHappyPath(Response<CommunicationRoom> roomResult, int httpStatusCode) {
+        System.out.println("I came here" + roomResult.getStatusCode());
         assertEquals(roomResult.getStatusCode(), httpStatusCode);
         assertNotNull(roomResult.getValue().getRoomId());
     }

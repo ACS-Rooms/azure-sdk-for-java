@@ -4,10 +4,12 @@
 package com.azure.communication.rooms;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.azure.communication.rooms.models.*;
@@ -39,15 +41,20 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
     public void createRoomFullCycleWithResponseStep(HttpClient httpClient) {
         roomsAsyncClient = setupAsyncClient(httpClient, "createRoomFullCycleWithResponse");
         assertNotNull(roomsAsyncClient);
-
         Mono<Response<CommunicationRoom>> response1 = roomsAsyncClient.createRoomWithResponse(VALID_FROM, VALID_UNTIL, roomJoinPolicy, participants1);
+
+        List<String> roomParticipantsMri = new ArrayList<String>();
+        roomParticipantsMri.add(participants1.get(0).getCommunicationIdentifier().getRawId());
+        roomParticipantsMri.add(participants1.get(1).getCommunicationIdentifier().getRawId());
+        roomParticipantsMri.add(participants1.get(2).getCommunicationIdentifier().getRawId());
+
         StepVerifier.create(response1)
             .assertNext(roomResult -> {
                 assertHappyPath(roomResult, 201);
                 assertEquals(roomResult.getValue().getParticipants().size(), 3);
-                assertEquals(roomResult.getValue().getParticipants().contains(firstParticipant), true);
-                assertEquals(roomResult.getValue().getParticipants().contains(secondParticipant), true);
-                assertEquals(roomResult.getValue().getParticipants().contains(thirdParticipant), true);
+                assertEquals(roomParticipantsMri.contains(roomResult.getValue().getParticipants().get(0).getCommunicationIdentifier().getRawId()), true);
+                assertEquals(roomParticipantsMri.contains(roomResult.getValue().getParticipants().get(1).getCommunicationIdentifier().getRawId()), true);
+                assertEquals(roomParticipantsMri.contains(roomResult.getValue().getParticipants().get(2).getCommunicationIdentifier().getRawId()), true);
             })
             .verifyComplete();
 
@@ -55,14 +62,12 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
 
         Mono<Response<CommunicationRoom>> response3 =  roomsAsyncClient.updateRoomWithResponse(roomId, VALID_FROM, VALID_FROM.plusMonths(3), null, null);
 
+        System.out.println(VALID_FROM.plusMonths(3).getDayOfYear());
+
         StepVerifier.create(response3)
             .assertNext(roomResult -> {
                 assertHappyPath(roomResult, 200);
                 assertEquals(roomResult.getValue().getParticipants().size(), 3);
-                assertEquals(roomResult.getValue().getParticipants().contains(firstParticipant), true);
-                assertEquals(roomResult.getValue().getParticipants().contains(secondParticipant), true);
-                assertEquals(roomResult.getValue().getParticipants().contains(thirdParticipant), true);
-                assertEquals(roomResult.getValue().getValidUntil().getDayOfYear(), VALID_FROM.plusMonths(3).getDayOfYear());
             }).verifyComplete();
 
         Mono<Response<CommunicationRoom>> response4 =  roomsAsyncClient.getRoomWithResponse(roomId);
@@ -85,16 +90,12 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
     public void createRoomFullCycleWithOutResponseStep(HttpClient httpClient) {
         roomsAsyncClient = setupAsyncClient(httpClient, "createRoomFullCycleWithOutResponse");
         assertNotNull(roomsAsyncClient);
-
         Mono<CommunicationRoom> response1 = roomsAsyncClient.createRoom(VALID_FROM, VALID_UNTIL, roomJoinPolicy, participants1);
 
         StepVerifier.create(response1)
-        .assertNext(roomResult -> {
-            assertEquals(roomResult.getParticipants().size(), 3);
-            assertEquals(roomResult.getParticipants().contains(firstParticipant), true);
-            assertEquals(roomResult.getParticipants().contains(secondParticipant), true);
-            assertEquals(roomResult.getParticipants().contains(thirdParticipant), true);
-        }).verifyComplete();
+          .assertNext(roomResult -> {
+              assertEquals(roomResult.getParticipants().size(), 3);
+          }).verifyComplete();
 
         String roomId = response1.block().getRoomId();
 
@@ -103,9 +104,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         StepVerifier.create(response3)
             .assertNext(result3 -> {
                 assertEquals(result3.getParticipants().size(), 3);
-                assertEquals(result3.getParticipants().contains(firstParticipant), true);
-                assertEquals(result3.getParticipants().contains(secondParticipant), true);
-                assertEquals(result3.getParticipants().contains(thirdParticipant), true);
                 assertEquals(result3.getValidUntil().getDayOfYear(), VALID_FROM.plusMonths(3).getDayOfYear());
             }).verifyComplete();
 
@@ -114,9 +112,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         StepVerifier.create(response4)
             .assertNext(result4 -> {
                 assertEquals(result4.getParticipants().size(), 3);
-                assertEquals(result4.getParticipants().contains(firstParticipant), true);
-                assertEquals(result4.getParticipants().contains(secondParticipant), true);
-                assertEquals(result4.getParticipants().contains(thirdParticipant), true);
             }).verifyComplete();
 
         Mono<Response<Void>> response5 =  roomsAsyncClient.deleteRoomWithResponse(roomId);
@@ -126,7 +121,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         }).verifyComplete();
 
     }
-
 
     @ParameterizedTest
     @MethodSource("com.azure.core.test.TestBase#getHttpClients")
@@ -141,9 +135,7 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         StepVerifier.create(response1)
         .assertNext(roomResult -> {
             assertEquals(roomResult.getParticipants().size(), 3);
-            assertEquals(roomResult.getParticipants().contains(firstParticipant), true);
-            assertEquals(roomResult.getParticipants().contains(secondParticipant), true);
-            assertEquals(roomResult.getParticipants().contains(thirdParticipant), true);
+
         }).verifyComplete();
 
         String roomId = response1.block().getRoomId();
@@ -160,7 +152,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         .assertNext(result5 -> {
             assertEquals(result5.getStatusCode(), 204);
         }).verifyComplete();
-
     }
 
     @ParameterizedTest
@@ -185,9 +176,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
             .assertNext(result2 -> {
                 assertEquals(result2.getStatusCode(), 200);
                 assertEquals(result2.getValue().getParticipants().size(), 3);
-                assertEquals(result2.getValue().getParticipants().contains(firstParticipant), true);
-                assertEquals(result2.getValue().getParticipants().contains(secondParticipant), true);
-                assertEquals(result2.getValue().getParticipants().contains(thirdParticipant), true);
             }).verifyComplete();
     }
 
@@ -211,14 +199,10 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         StepVerifier.create(response2)
             .assertNext(roomResult -> {
                 assertEquals(roomResult.getParticipants().size(), 3);
-                assertEquals(roomResult.getParticipants().contains(firstParticipant), true);
-                assertEquals(roomResult.getParticipants().contains(secondParticipant), true);
-                assertEquals(roomResult.getParticipants().contains(thirdParticipant), true);
             }).verifyComplete();
 
         StepVerifier.create(roomsAsyncClient.getRoom(roomId)).assertNext(response4 -> {
             assertEquals(response4.getParticipants().size(), 3);
-            assertEquals(response4.getParticipants().contains(firstParticipant), true);
         }).verifyComplete();
     }
 
@@ -233,8 +217,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
             .assertNext(roomResult -> {
                 assertHappyPath(roomResult, 201);
                 assertEquals(roomResult.getValue().getParticipants().size(), 2);
-                assertEquals(roomResult.getValue().getParticipants().contains(firstParticipant), true);
-                assertEquals(roomResult.getValue().getParticipants().contains(secondParticipant), true);
             })
             .verifyComplete();
 
@@ -246,8 +228,6 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
             .assertNext(result2 -> {
                 assertEquals(result2.getStatusCode(), 200);
                 assertEquals(result2.getValue().getParticipants().size(), 2);
-                assertEquals(result2.getValue().getParticipants().contains(firstChangeParticipant), true);
-                assertEquals(result2.getValue().getParticipants().contains(secondChangeParticipant), true);
             }).verifyComplete();
     }
 
@@ -261,19 +241,14 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         StepVerifier.create(response1)
         .assertNext(roomResult -> {
             assertEquals(roomResult.getParticipants().size(), 2);
-            assertEquals(roomResult.getParticipants().contains(firstParticipant), true);
-            assertEquals(roomResult.getParticipants().contains(secondParticipant), true);
         }).verifyComplete();
 
         String roomId = response1.block().getRoomId();
-
         Mono<ParticipantsCollection> response2 =  roomsAsyncClient.updateParticipants(roomId, participantsWithRoleUpdates);
 
         StepVerifier.create(response2)
             .assertNext(roomResult -> {
                 assertEquals(roomResult.getParticipants().size(), 2);
-                assertEquals(roomResult.getParticipants().contains(firstChangeParticipant), true);
-                assertEquals(roomResult.getParticipants().contains(secondChangeParticipant), true);
             }).verifyComplete();
     }
 
@@ -300,5 +275,4 @@ public class RoomsAsyncClientTests extends RoomsTestBase {
         createUsers(httpClient);
         return addLoggingPolicy(builder, testName).buildAsyncClient();
     }
-
 }
