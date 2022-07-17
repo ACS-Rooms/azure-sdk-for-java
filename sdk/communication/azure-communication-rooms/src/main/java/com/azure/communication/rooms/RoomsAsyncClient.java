@@ -9,9 +9,6 @@ import com.azure.communication.rooms.implementation.converters.RoomParticipantCo
 import com.azure.communication.rooms.implementation.converters.RoomsErrorConverter;
 import com.azure.communication.rooms.implementation.converters.ParticipantsCollectionConverter;
 import com.azure.communication.rooms.implementation.models.RoomModel;
-import com.azure.communication.rooms.implementation.models.RoomParticipantInternal;
-import com.azure.communication.rooms.implementation.models.UpdateRoomRequest;
-import com.azure.communication.rooms.implementation.models.CreateRoomRequest;
 import com.azure.communication.rooms.models.CommunicationRoom;
 import com.azure.communication.rooms.models.RoomJoinPolicy;
 import com.azure.communication.rooms.models.RoomParticipant;
@@ -23,7 +20,6 @@ import com.azure.communication.rooms.implementation.models.AddParticipantsReques
 import com.azure.communication.rooms.implementation.models.CommunicationErrorResponseException;
 import com.azure.communication.rooms.implementation.models.CreateRoomRequest;
 import com.azure.communication.rooms.implementation.models.RemoveParticipantsRequest;
-import com.azure.communication.rooms.models.CommunicationRoom;
 import com.azure.communication.rooms.models.ParticipantsCollection;
 import com.azure.core.annotation.ReturnType;
 import com.azure.core.annotation.ServiceClient;
@@ -33,11 +29,9 @@ import com.azure.core.http.rest.SimpleResponse;
 import com.azure.core.util.Context;
 import com.azure.core.util.logging.ClientLogger;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import reactor.core.publisher.Mono;
@@ -125,7 +119,7 @@ public class RoomsAsyncClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants);
+        return updateRoom(roomId, validFrom, validUntil, roomJoinPolicy, participants, null);
     }
 
     Mono<CommunicationRoom> updateRoom(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
@@ -154,7 +148,7 @@ public class RoomsAsyncClient {
      */
     @ServiceMethod(returns = ReturnType.SINGLE)
     public Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants) {
-        return updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants);
+        return updateRoomWithResponse(roomId, validFrom, validUntil, roomJoinPolicy, participants, null);
     }
 
     Mono<Response<CommunicationRoom>> updateRoomWithResponse(String roomId, OffsetDateTime validFrom, OffsetDateTime validUntil, RoomJoinPolicy roomJoinPolicy, List<RoomParticipant> participants, Context context) {
@@ -412,71 +406,57 @@ public class RoomsAsyncClient {
         }
     }
 
-    // /**
-    //  * Get a room participants.
-    //  *
-    //  * @param roomId The room Id.
-    //  * @return The existing room.
-    //  */
-    // @ServiceMethod(returns = ReturnType.SINGLE)
-    // public Mono<ParticipantsCollection> getRoomParticipants(String roomId) {
-    //     return getRoomParticipants(roomId, null);
-    // }
+    /**
+     * Get a room participants.
+     *
+     * @param roomId The room Id.
+     * @return The existing room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<ParticipantsCollection> getRoomParticipants(String roomId) {
+        return getRoomParticipants(roomId, null);
+    }
 
-    // Mono<ParticipantsCollection> getRoomParticipants(String roomId, Context context) {
+    Mono<ParticipantsCollection> getRoomParticipants(String roomId, Context context) {
 
-    //     context = context == null ? Context.NONE : context;
-    //     try {
-    //         Objects.requireNonNull(roomId, "'roomId' cannot be null.");
-    //         return this.roomsClient
-    //         .getParticipantsAsync(roomId, context)
-    //         .map(result -> new SimpleResponse<ParticipantsCollection>(
-    //             result, ParticipantsCollectionConverter.convert(result)))
-    //         .flatMap((Response<ParticipantsCollection> response) -> {
-    //             return Mono.just(response.getValue());
-    //         });
-    //     } catch (RuntimeException ex) {
-    //         return monoError(logger, ex);
-    //     }
+        context = context == null ? Context.NONE : context;
+        try {
+            Objects.requireNonNull(roomId, "'roomId' cannot be null.");
+            return this.roomsClient
+            .getParticipantsWithResponseAsync(roomId, context)
+            .map(result -> new SimpleResponse<ParticipantsCollection>(
+                result, ParticipantsCollectionConverter.convert(result.getValue())))
+            .flatMap((Response<ParticipantsCollection> response) -> {
+                return Mono.just(response.getValue());
+            });
+        } catch (RuntimeException ex) {
+            return monoError(logger, ex);
+        }
+    }
 
+    /**
+     * Get an existing room participants
+     *
+     * @param roomId The room Id.
+     * @return The existing room.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Mono<Response<ParticipantsCollection>> getRoomParticipantsWithResponse(String roomId) {
+        return getRoomParticipantsWithResponse(roomId, null);
+    }
 
-    //     context = context == null ? Context.NONE : context;
-    //     try {
-    //         return this.roomsClient
-    //         .getParticipantsAsync(roomId, context)
-    //         .map(result -> new SimpleResponse<ParticipantsCollection>(
-    //             result, ParticipantsCollectionConverter.convert(result.getValue())))
-    //         .flatMap((Response<ParticipantsCollection> response) -> {
-    //             return Mono.just(response.getValue());
-    //         });
-    //     } catch (RuntimeException ex) {
-    //         return monoError(logger, ex);
-    //     }
-    // }
-
-    // /**
-    //  * Get an existing room participants
-    //  *
-    //  * @param roomId The room Id.
-    //  * @return The existing room.
-    //  */
-    // @ServiceMethod(returns = ReturnType.SINGLE)
-    // public Mono<Response<ParticipantsCollection>> getRoomParticipantsWithResponse(String roomId) {
-    //     return getRoomParticipantsWithResponse(roomId, null);
-    // }
-
-    // Mono<Response<ParticipantsCollection>> getRoomParticipantsWithResponse(String roomId, Context context) {
-    //     context = context == null ? Context.NONE : context;
-    //     try {
-    //         return this.roomsClient
-    //         .getParticipantsAsync(roomId, context)
-    //         .onErrorMap(CommunicationErrorResponseException.class, e -> translateException(e))
-    //         .map(result -> new SimpleResponse<ParticipantsCollection>(
-    //             result, ParticipantsCollectionConverter.convert(result)));
-    //     } catch (RuntimeException ex) {
-    //         return monoError(logger, ex);
-    //     }
-    // }
+    Mono<Response<ParticipantsCollection>> getRoomParticipantsWithResponse(String roomId, Context context) {
+        context = context == null ? Context.NONE : context;
+        try {
+            return this.roomsClient
+            .getParticipantsWithResponseAsync(roomId, context)
+            .onErrorMap(CommunicationErrorResponseException.class, e -> translateException(e))
+            .map(result -> new SimpleResponse<ParticipantsCollection>(
+                result, ParticipantsCollectionConverter.convert(result.getValue())));
+        } catch (RuntimeException ex) {
+            return monoError(logger, ex);
+        }
+    }
 
     private CommunicationRoom getCommunicationRoomFromResponse(RoomModel room) {
         List<com.azure.communication.rooms.models.RoomParticipant> roomParticipants = new ArrayList<>();

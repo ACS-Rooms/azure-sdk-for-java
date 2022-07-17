@@ -14,7 +14,6 @@ import com.azure.core.http.rest.Response;
 import com.azure.core.util.Context;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Client for rooms operations with Azure Communication Rooms Service
@@ -197,4 +196,28 @@ public class RoomsClient {
     public Response<ParticipantsCollection> removeParticipantsWithResponse(String roomId, List<RoomParticipant> participants, Context context) {
         return roomsAsyncClient.removeParticipantsWithResponse(roomId, participants, context).block();
     }
+
+    /**
+     * List Room participants.
+     *
+     * @param roomId The room id.
+     * @return Room Participants List
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public ParticipantsCollection listParticipants(String roomId) {
+        return roomsAsyncClient.getRoomParticipants(roomId).block();
+    }
+
+    /**
+     * Update participants to an existing room with response.
+     *
+     * @param roomId The room id.
+     * @param context The context of key value pairs for http request
+     * @return The Room Participants list.
+     */
+    @ServiceMethod(returns = ReturnType.SINGLE)
+    public Response<ParticipantsCollection> listParticipantsWithResponse(String roomId, Context context) {
+        return roomsAsyncClient.getRoomParticipantsWithResponse(roomId, context).block();
+    }
+
 }
