@@ -8,14 +8,18 @@ module com.azure.communication.common {
     // public API surface area
     exports com.azure.communication.common;
 
-    opens com.azure.communication.common
-        to com.fasterxml.jackson.databind;
+    opens com.azure.communication.common to
+        com.fasterxml.jackson.databind,
+        com.azure.communication.identity,
+        com.azure.communication.rooms;
 
     exports com.azure.communication.common.implementation to
         com.azure.communication.sms,
         com.azure.communication.identity,
         com.azure.communication.phonenumbers,
         com.azure.communication.chat,
+        com.azure.communication.rooms,
         com.azure.communication.callingserver,
         com.azure.communication.networktraversal;
+
 }
